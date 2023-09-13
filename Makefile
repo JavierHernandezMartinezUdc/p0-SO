@@ -1,4 +1,4 @@
-all: limpiar compilar ejecutar
+todo: borrar compilar ejecutar
 
 p0.o:
 	gcc -c p0.c
@@ -6,9 +6,10 @@ p0.o:
 
 compilar: p0.o
 	gcc -Wall -o p0 p0.o
+	rm -f *.o
 
 ejecutar:
 	./p0
 
-limpiar:
+borrar:
 	rm -f *.o *.txt p0

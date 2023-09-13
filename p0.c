@@ -30,12 +30,17 @@ int elegirComando(char *comando){
 
     for(i=0;i<14;i++){
         if(strcmp(comando,comandosDisponibles[i])==0){
-            return i; //Preguntar si podo break
+            return i; //Preguntar si se pode break
         }
     }
 
     return i;
 
+}
+
+void bye(bool *terminado){
+    printf("Comando 13: Salir del Shell\n");
+    *terminado=1;
 }
 
 void procesarComando(int comando, char *trozos[], bool *terminado){
@@ -80,8 +85,7 @@ void procesarComando(int comando, char *trozos[], bool *terminado){
             printf("Comando 12\n");
             break;
         case 13:
-            printf("Comando 13: Exits the shell\n");
-            *terminado=1;
+            bye(terminado);
             break;
         default:
             printf("Comando desconocido\n");
@@ -95,13 +99,12 @@ int main(){
     char *comando=malloc(100);
     char **trozos=malloc(100);
     int eleccionComando;
-    
-
 
     while(!terminado){
         imprimirPrompt();
         leerComando(comando);
         TrocearCadena(comando, trozos);
+        //Aqui insertase na lista historial o comando
         eleccionComando=elegirComando(trozos[0]);
         procesarComando(eleccionComando, trozos, &terminado);
     }
