@@ -13,3 +13,6 @@ ejecutar:
 
 borrar:
 	rm -f *.o *.txt p0
+
+valgrind: borrar compilar
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-report.txt ./p0
