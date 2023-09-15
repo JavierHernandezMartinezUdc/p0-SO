@@ -5,6 +5,8 @@
 #include <string.h>
 #include <time.h>
 #include <sys/utsname.h>
+#include "shellopenfiles.h"
+#include <fcntl.h>
 
 int TrocearCadena(char* cadena, char* trozos[]){
     int i=1;
@@ -107,6 +109,123 @@ void hora(){
     printf("%02d:%02d:%02d\n", hor, min, sec);
 }
 
+void printList(tList L) {
+    tPos p;
+    tItem d;
+
+    for (p = first(L); p != NULL; p = next(p, L)) {
+        d = getItem(p, L);
+        printf("descriptor: %d -> %s %s\n", d.df, d.nombre, d.mode);
+    }
+}
+
+void Cmd_open (char * tr[], tList *L) {
+    int i, df, mode = 0;
+    tItem d;
+
+    if (tr[1] == NULL) { /*no hay parametro*/
+        printList(*L);
+        return;
+    }
+    for (i = 2; tr[i] != NULL; i++) {
+        if (!strcmp(tr[i], "cr")) mode |= O_CREAT;
+        else if (!strcmp(tr[i], "ex")) mode |= O_EXCL;
+        else if (!strcmp(tr[i], "ro")) mode |= O_RDONLY;
+        else if (!strcmp(tr[i], "wo")) mode |= O_WRONLY;
+        else if (!strcmp(tr[i], "rw")) mode |= O_RDWR;
+        else if (!strcmp(tr[i], "ap")) mode |= O_APPEND;
+        else if (!strcmp(tr[i], "tr")) mode |= O_TRUNC;
+        else break;
+    }
+    df=open(tr[1], mode, 0777);
+    if (df==-1) {
+        perror("Imposible abrir fichero");
+    }
+    else {
+
+        if(tr[2]==NULL){
+            strcpy(d.mode,"");
+        }
+        else{
+            switch (mode) {
+                case O_CREAT:
+                    strcpy(d.mode,"O_CREAT");
+                    break;
+                case O_EXCL:
+                    strcpy(d.mode,"O_EXCL");
+                    break;
+                case O_RDONLY:
+                    strcpy(d.mode,"O_RDONLY");
+                    break;
+                case O_WRONLY:
+                    strcpy(d.mode,"O_WRONLY");
+                    break;
+                case O_RDWR:
+                    strcpy(d.mode,"O_RDWR");
+                    break;
+                case O_APPEND:
+                    strcpy(d.mode,"O_APPEND");
+                    break;
+                case O_TRUNC:
+                    strcpy(d.mode,"O_TRUNC");
+                    break;
+                default:
+                    strcpy(d.mode,"");
+            }
+        }
+        d.df=df;
+        strcpy(d.nombre,tr[1]);
+        insertItem(d,L);
+        printf("Anadida entrada %d a la tabla ficheros abiertos\n",df);
+    }
+}
+
+void Cmd_close(char *tr[], tList *L){
+    int df;
+
+    if(tr[1]!=NULL){
+        df=atoi(tr[1]);
+    }
+
+    if ((tr[1]==NULL) || (df<0)) { //no hay parametro
+        printList(*L); //o el descriptor es menor que 0
+        return;
+    }
+    if (close(df)==-1)
+        perror("Inposible cerrar descriptor");
+    else deleteAtPosition(findItem(df, *L), L);
+}
+
+void Cmd_dup (char * tr[], tList *L){
+    int df, dfdup;
+    char aux[4096], *p=malloc(1000);
+    tItem d, j;
+
+    if(tr[1]!=NULL){
+        df=atoi(tr[1]);
+    }
+    if ((tr[1]==NULL) || (df<0)) { //no hay parametro
+        printList(*L);                 //o el descriptor es menor que 0
+        return;
+    }
+//hasta aqui esta correcto
+    d=getItem(findItem(df,*L),*L);
+    strcpy(p,d.nombre);
+    sprintf (aux,"dup %d (%s)",df, p);
+
+    dfdup=dup(df);
+    if (dfdup==-1) {
+        perror("Imposible duplicar descriptor");
+    }
+
+    strcpy(j.mode,""); //Sin flag
+    j.df=dfdup;
+    strcpy(j.nombre,aux);
+    insertItem(j,L);
+
+    free(p);
+}
+
 void infosys(){
     struct utsname infosys;
 
@@ -118,7 +237,7 @@ void salir(bool *terminado){
     *terminado=1;
 }
 
-void procesarComando(int comando, char *trozos[], bool *terminado){
+void procesarComando(int comando, char *trozos[], bool *terminado, tList *L){
     switch(comando){
         case 0:
             authors(trozos);
@@ -142,16 +261,16 @@ void procesarComando(int comando, char *trozos[], bool *terminado){
             printf("Comando 6\n");
             break;
         case 7:
-            printf("Comando 7\n");
+            Cmd_open(trozos, L);
             break;
         case 8:
-            printf("Comando 8\n");
+            Cmd_close(trozos, L);
             break;
         case 9:
-            printf("Comando 9\n");
+            Cmd_dup(trozos, L);
             break;
         case 10:
-            printf("Comando 10\n");
+            printList(*L);
             break;
         case 11:
             infosys();
@@ -174,12 +293,36 @@ void procesarComando(int comando, char *trozos[], bool *terminado){
     }
 }
 
-int main(){
+void insertarESstd(tList *L){
+    tItem stdin, stdout, stderr;
 
+    stdin.df=STDIN_FILENO;
+    strcpy(stdin.mode,"O_RDWR");
+    strcpy(stdin.nombre,"entrada estandar");
+
+    stdout.df=STDOUT_FILENO;
+    strcpy(stdout.mode,"O_RDWR");
+    strcpy(stdout.nombre,"salida estandar");
+
+    stderr.df=STDERR_FILENO;
+    strcpy(stderr.mode,"O_RDWR");
+    strcpy(stderr.nombre,"error estandar");
+
+    insertItem(stdin,L);
+    insertItem(stdout,L);
+    insertItem(stderr,L);
+}
+
+int main(){
     bool terminado=0;
     char *comando=malloc(100);
     char **trozos=malloc(100);
     int eleccionComando;
+    tList L;
+
+    createEmptyList(&L);
+    insertarESstd(&L);
+
 
     while(!terminado){
         imprimirPrompt();
@@ -187,7 +330,7 @@ int main(){
         TrocearCadena(comando, trozos);
         //Aqui insertase na lista historial o comando
         eleccionComando=elegirComando(trozos[0]);
-        procesarComando(eleccionComando, trozos, &terminado);
+        procesarComando(eleccionComando, trozos, &terminado, &L);
     }
 
     //printf("Numero de trozos del comando: %d\n",TrocearCadena(comando, trozos));
