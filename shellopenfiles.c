@@ -5,6 +5,10 @@ void createEmptyList(tList *L){
     *L=NULL;
 }
 
+bool isEmptyList(tList L){
+    return L==NULL;
+}
+
 bool createNode(tPos *p){
     *p=malloc(sizeof(struct tNode));
     return p!=NULL;

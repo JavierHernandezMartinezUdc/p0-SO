@@ -31,9 +31,9 @@ void leerComando(char *comando){
 
 int elegirComando(char *comando){
     int i;
-    char *comandosDisponibles[16]={"authors","pid","chdir","date","time","hist","comand","open","close","dup","listopen","infosys","help","bye","exit","quit"}; //16 de tamaño porque se el numero de comandos que hay, en este caso 14. Aumentaran en practicas consecutivas
-    //Este array ten tamaño 16 porque e o numero de comandos que hay
-    
+    char *comandosDisponibles[16]={"authors","pid","chdir","date","time","hist","comand","open","close","dup","listopen","infosys","help","bye","exit","quit"};
+    //16 de tamaño porque se el numero de comandos que hay, en este caso 14. Aumentaran en practicas consecutivas
+
     for(i=0;i<16;i++){ //Cambiar segun tamaño array
         if(strcmp(comando,comandosDisponibles[i])==0){
             return i;
@@ -317,6 +317,10 @@ void insertarESstd(tList *L){
     insertItem(stderr,L);
 }
 
+void listMemFree(tList *L){
+    while(!isEmptyList(*L)) deleteAtPosition(first(*L),L);
+}
+
 int main(){
     bool terminado=0;
     char *comando=malloc(100);
@@ -340,6 +344,7 @@ int main(){
     //printf("Numero de trozos del comando: %d\n",TrocearCadena(comando, trozos));
     //printf("Comando %s. argumento %s\n",comando,trozos[1]);
 
+    listMemFree(&L);
     free(comando);
     free(trozos);
 

@@ -5,7 +5,7 @@
 typedef struct tItem{
     int df;
     char nombre[4096]; //tamaño maximo de una ruta en linux
-    char mode[9];
+    char mode[9]; //nombre de modo mas largo
 } tItem;
 
 typedef struct tNode* tPos;
@@ -16,6 +16,7 @@ struct tNode{
 typedef tPos tList;
 
 void createEmptyList(tList *L);
+bool isEmptyList(tList L);
 bool insertItem(tItem d, tList *L);
 void deleteAtPosition(tPos p, tList *L);
 tPos findItem(int df, tList L);
