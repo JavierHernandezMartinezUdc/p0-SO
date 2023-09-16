@@ -4,10 +4,11 @@
 #include <stdbool.h>
 #include <string.h>
 #include <time.h>
-#include <sys/utsname.h>
+#include <sys/utsname.h> //Utilizase en infosys
 #include "shellopenfiles.h"
-#include <fcntl.h>
+#include <fcntl.h> //utilizase en open
 
+//En trozos[0] gardase o comando e a partir de trozos[1] os argumentos
 int TrocearCadena(char* cadena, char* trozos[]){
     int i=1;
 
@@ -31,10 +32,11 @@ void leerComando(char *comando){
 int elegirComando(char *comando){
     int i;
     char *comandosDisponibles[16]={"authors","pid","chdir","date","time","hist","comand","open","close","dup","listopen","infosys","help","bye","exit","quit"}; //16 de tamaño porque se el numero de comandos que hay, en este caso 14. Aumentaran en practicas consecutivas
-
+    //Este array ten tamaño 16 porque e o numero de comandos que hay
+    
     for(i=0;i<16;i++){ //Cambiar segun tamaño array
         if(strcmp(comando,comandosDisponibles[i])==0){
-            return i; //Preguntar si se pode break
+            return i;
         }
     }
 
@@ -55,7 +57,7 @@ void authors(char *trozos[]){
     }
 }
 
-void pid(char *trozos[]){ //Preguntar como se comproba
+void pid(char *trozos[]){
 
     if(trozos[1]==NULL){
         printf("PID: %d\n",getpid());
@@ -82,11 +84,11 @@ void changedir(char *trozos[]){
 }
 
 void fecha(){
-    time_t actual;
-    struct tm *fecha;
+    time_t actual; //tipo de dato de libreria time.h
+    struct tm *fecha; //struct que conten informacion de dia, mes, ano, horas, minutos e segundos a partir de time_t
 
-    time(&actual);
-    fecha = localtime(&actual);
+    time(&actual); //tempo desde epoch (1 de enero de 1970)
+    fecha = localtime(&actual); //localtime devolve o struct en funcion da zona horaria
 
     int dia = fecha->tm_mday;
     int mes = fecha->tm_mon + 1;
@@ -96,7 +98,7 @@ void fecha(){
 }
 
 void hora(){
-    time_t actual;
+    time_t actual; //igual que funcion fecha pero datos distintos do struct
     struct tm *hora;
 
     time(&actual);
@@ -142,7 +144,7 @@ void Cmd_open (char * tr[], tList *L) {
         perror("Imposible abrir fichero");
     }
     else {
-
+        //mapeo de modos de apertura
         if(tr[2]==NULL){
             strcpy(d.mode,"");
         }
@@ -170,7 +172,7 @@ void Cmd_open (char * tr[], tList *L) {
                     strcpy(d.mode,"O_TRUNC");
                     break;
                 default:
-                    strcpy(d.mode,"");
+                    strcpy(d.mode,"Desconocido");
             }
         }
         d.df=df;
@@ -192,7 +194,7 @@ void Cmd_close(char *tr[], tList *L){
         return;
     }
     if (close(df)==-1)
-        perror("Inposible cerrar descriptor");
+        perror("Imposible cerrar descriptor");
     else deleteAtPosition(findItem(df, *L), L);
 }
 
@@ -205,10 +207,10 @@ void Cmd_dup (char * tr[], tList *L){
         df=atoi(tr[1]);
     }
     if ((tr[1]==NULL) || (df<0)) { //no hay parametro
-        printList(*L);                 //o el descriptor es menor que 0
+        printList(*L); //o el descriptor es menor que 0
         return;
     }
-//hasta aqui esta correcto
+
     d=getItem(findItem(df,*L),*L);
     strcpy(p,d.nombre);
     sprintf (aux,"dup %d (%s)",df, p);
@@ -218,7 +220,7 @@ void Cmd_dup (char * tr[], tList *L){
         perror("Imposible duplicar descriptor");
     }
 
-    strcpy(j.mode,""); //Sin flag
+    strcpy(j.mode,""); //Sin modo de apertura
     j.df=dfdup;
     strcpy(j.nombre,aux);
     insertItem(j,L);
@@ -296,20 +298,22 @@ void procesarComando(int comando, char *trozos[], bool *terminado, tList *L){
 void insertarESstd(tList *L){
     tItem stdin, stdout, stderr;
 
+    //stdin
     stdin.df=STDIN_FILENO;
     strcpy(stdin.mode,"O_RDWR");
     strcpy(stdin.nombre,"entrada estandar");
+    insertItem(stdin,L);
 
+    //stdout
     stdout.df=STDOUT_FILENO;
     strcpy(stdout.mode,"O_RDWR");
     strcpy(stdout.nombre,"salida estandar");
+    insertItem(stdout,L);
 
+    //stderr
     stderr.df=STDERR_FILENO;
     strcpy(stderr.mode,"O_RDWR");
     strcpy(stderr.nombre,"error estandar");
-
-    insertItem(stdin,L);
-    insertItem(stdout,L);
     insertItem(stderr,L);
 }
 
@@ -328,8 +332,8 @@ int main(){
         imprimirPrompt();
         leerComando(comando);
         TrocearCadena(comando, trozos);
-        //Aqui insertase na lista historial o comando
         eleccionComando=elegirComando(trozos[0]);
+        //Aqui insertase na lista historial o comando
         procesarComando(eleccionComando, trozos, &terminado, &L);
     }
 
