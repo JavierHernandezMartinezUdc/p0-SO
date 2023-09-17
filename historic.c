@@ -18,7 +18,7 @@ tPosH lastH(tListH L) {
     for(p = firstH(L); p -> next != NULL; p = p -> next);
     return p;
 }
-
+/*
 tPosH previousH(tPosH p, tListH L) {
     tPosH q;
     if(p == firstH(L)) {
@@ -28,7 +28,7 @@ tPosH previousH(tPosH p, tListH L) {
         return q;
     }
 }
-
+*/
 tPosH findItemH(int d, tListH L) {
     tPosH p;
     for(p = L;(p != NULL) && (p -> data.id != d); p = p -> next);

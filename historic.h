@@ -23,7 +23,7 @@ bool isEmptyListH(tListH L);
 tPosH firstH(tListH L);
 tPosH lastH(tListH L);
 tPosH nextH(tPosH p, tListH L);
-tPosH previousH(tPosH p, tListH L);
+//tPosH previousH(tPosH p, tListH L);
 tPosH findItemH(int d, tListH L);
 bool insertItemH(tItemH t, tListH *L);
 void deleteAtPositionH(tPosH p, tListH *L);
