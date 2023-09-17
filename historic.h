@@ -1,38 +1,32 @@
 #ifndef LIST_H
 #define LIST_H
-
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <stdbool.h>
 
 #define NAME_LENGTH_LIMIT 25
-#define CNULL NULL
 
-typedef struct tItem {
+typedef struct tItemH {
     int id;
     char nombre[NAME_LENGTH_LIMIT];
-} tItem;
+} tItemH;
 
-typedef struct tNode *tPos;
+typedef struct tNodeH *tPosH;
 
-struct tNode {
-    tItem data;
-    tPos next;
+struct tNodeH {
+    tItemH data;
+    tPosH next;
 };
 
-typedef tPos tList;
+typedef tPosH tListH;
 
-void createEmptyList(tList *L);
-bool isEmptyList(tList L);
-tPos first(tList L);
-tPos last(tList L);
-tPos next(tPos p, tList L);
-tPos previous(tPos p, tList L);
-tPos findItem(int d, tList L);
-bool insertItem(tItem t, tPos p, tList *L);
-void deleteAtPosition (tPos p, tList *L);
-tItem getItem(tPos p, tList L);
-void updateItem(tItem i, tList *L);
-void deleteList(tList *L);
+void createEmptyListH(tListH *L);
+bool isEmptyListH(tListH L);
+tPosH firstH(tListH L);
+tPosH lastH(tListH L);
+tPosH nextH(tPosH p, tListH L);
+tPosH previousH(tPosH p, tListH L);
+tPosH findItemH(int d, tListH L);
+bool insertItemH(tItemH t, tListH *L);
+void deleteAtPositionH(tPosH p, tListH *L);
+tItemH getItemH(tPosH p, tListH L);
+void deleteListH(tListH *L);
 #endif

@@ -1,59 +1,56 @@
 #include "historic.h"
+#include <stdlib.h>
 
-void createEmptyList(tList *L) {
-    *L = CNULL;
+void createEmptyListH(tListH *L) {
+    *L = NULL;
 }
 
-tPos first(tList L) {
+tPosH firstH(tListH L) {
     return L;
 }
 
-tPos next(tPos p, tList L) {
+tPosH nextH(tPosH p, tListH L) {
     return p -> next;
 }
 
-tPos last(tList L) {
-    tPos p;
-    for(p = first(L); p -> next != CNULL; p = p -> next);
+tPosH lastH(tListH L) {
+    tPosH p;
+    for(p = firstH(L); p -> next != NULL; p = p -> next);
     return p;
 }
 
-tPos previous(tPos p, tList L) {
-    tPos q;
-    if(p == first(L)) {
-        return CNULL;
+tPosH previousH(tPosH p, tListH L) {
+    tPosH q;
+    if(p == firstH(L)) {
+        return NULL;
     } else {
-        for(q = first(L); q -> next != p; q = next(q,L));
+        for(q = firstH(L); q -> next != p; q = nextH(q,L));
         return q;
     }
 }
 
-tPos findItem(int d, tList L) {
-    tPos p;
-    for(p = L;(p != CNULL) && (p -> data.id != d); p = p -> next);
+tPosH findItemH(int d, tListH L) {
+    tPosH p;
+    for(p = L;(p != NULL) && (p -> data.id != d); p = p -> next);
     return p;
 }
 
-tItem getItem(tPos p, tList L) {
+tItemH getItemH(tPosH p, tListH L) {
     return p -> data;
 }
 
-bool isEmptyList(tList L) {
-    return (L == CNULL);
+bool isEmptyListH(tListH L) {
+    return (L == NULL);
 }
 
-void updateItem (tItem d, tPos p, tList *L) {
-    p -> data = d;
-}
-
-void deleteAtPosition (tPos p, tList *L) {
-    tPos q;
-    if(p == first(*L)) {
+void deleteAtPositionH(tPosH p, tListH *L) {
+    tPosH q;
+    if(p == firstH(*L)) {
         *L = (*L) -> next;
     } else {
-        if(p -> next == CNULL) {
+        if(p -> next == NULL) {
             for(q = *L; q -> next != p; q = q-> next);
-            q -> next = CNULL;
+            q -> next = NULL;
         } else {
             q = p -> next;
             p -> data = q -> data;
@@ -62,37 +59,38 @@ void deleteAtPosition (tPos p, tList *L) {
         }
     }
     free(p);
-    p = CNULL;
+    p = NULL;
 }
 
-bool createNode(tPos *p) {
+bool createNodeH(tPosH *p) {
     *p = malloc(sizeof(**p));
-    return *p != CNULL;
+    return *p != NULL;
 }
 
-bool insertItem(tItem d, tList *l) {
-    tPos q, r;
-    if (!createNode(&q)) {
+bool insertItemH(tItemH d, tListH *L){
+    tPosH q,r;
+
+    if(!createNodeH(&q)){
         return false;
-    } else {
-        q->data = d;
-        q->next = CNULL;
-        if (*l == CNULL) {
-            *l = q;
-        } else {
-                r = *l;
-                while (r->next != CNULL)
-                    r = r->next;
-                r->next = q;
-            }
+    }
+    else {
+        q->data=d;
+        q->next=NULL;
+
+        if(*L==NULL){
+            *L=q;
+        }
+        else{
+            for(r=*L;r->next!=NULL;r=r->next);
+            r->next=q;
         }
         return true;
     }
 }
 
-void deleteList(tList *L){
-    tPos p;
-    while (*L != CNULL){
+void deleteListH(tListH *L){
+    tPosH p;
+    while (*L != NULL){
         p=*L;
         *L=(*L)->next;
         free(p);

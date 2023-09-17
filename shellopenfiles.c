@@ -1,23 +1,23 @@
 #include "shellopenfiles.h"
 #include <stdlib.h>
 
-void createEmptyList(tList *L){
+void createEmptyListF(tListF *L){
     *L=NULL;
 }
 
-bool isEmptyList(tList L){
+bool isEmptyListF(tListF L){
     return L==NULL;
 }
 
-bool createNode(tPos *p){
-    *p=malloc(sizeof(struct tNode));
+bool createNodeF(tPosF *p){
+    *p=malloc(sizeof(struct tNodeF));
     return p!=NULL;
 }
 
-bool insertItem(tItem d, tList *L){
-    tPos q,r;
+bool insertItemF(tItemF d, tListF *L){
+    tPosF q,r;
 
-    if(!createNode(&q)){
+    if(!createNodeF(&q)){
         return false;
     }
     else {
@@ -35,8 +35,8 @@ bool insertItem(tItem d, tList *L){
     }
 }
 
-void deleteAtPosition(tPos p, tList *L){
-    tPos q;
+void deleteAtPositionF(tPosF p, tListF *L){
+    tPosF q;
 
     if(p==*L){
         *L=(*L)->next;
@@ -55,22 +55,22 @@ void deleteAtPosition(tPos p, tList *L){
     free(p);
 }
 
-tPos findItem(int df, tList L){
-    tPos p;
+tPosF findItemF(int df, tListF L){
+    tPosF p;
 
     for(p=L;p!=NULL && p->data.df!=df;p=p->next);
 
     return p;
 }
 
-tPos first(tList L){
+tPosF firstF(tListF L){
     return L;
 }
 
-tPos next(tPos p, tList L){
+tPosF nextF(tPosF p, tListF L){
     return p->next;
 }
 
-tItem getItem(tPos p, tList L){
+tItemF getItemF(tPosF p, tListF L){
     return (p->data);
 }

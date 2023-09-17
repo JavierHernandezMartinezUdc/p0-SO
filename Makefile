@@ -4,11 +4,14 @@ p0.o:
 	gcc -c p0.c
 # Preguntar -g
 
-lista.o:
+listaF.o:
 	gcc -c shellopenfiles.c
 
-compilar: p0.o lista.o
-	gcc -Wall -o p0 p0.o shellopenfiles.o
+listaH.o:
+	gcc -c historic.c
+
+compilar: p0.o listaF.o listaH.o
+	gcc -Wall -o p0 p0.o shellopenfiles.o historic.o
 	rm -f *.o
 
 ejecutar:

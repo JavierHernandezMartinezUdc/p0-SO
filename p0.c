@@ -7,6 +7,9 @@
 #include <sys/utsname.h> //Utilizase en infosys
 #include "shellopenfiles.h"
 #include <fcntl.h> //utilizase en open
+#include "historic.h"
+
+void comandN(char *trozos[], tListH *H, bool *terminado, tListF *L);
 
 //En trozos[0] gardase o comando e a partir de trozos[1] os argumentos
 int TrocearCadena(char* cadena, char* trozos[]){
@@ -31,7 +34,7 @@ void leerComando(char *comando){
 
 int elegirComando(char *comando){
     int i;
-    char *comandosDisponibles[16]={"authors","pid","chdir","date","time","hist","comand","open","close","dup","listopen","infosys","help","bye","exit","quit"};
+    char *comandosDisponibles[16]={"authors","pid","chdir","date","time","hist","command","open","close","dup","listopen","infosys","help","bye","exit","quit"};
     //16 de tamaño porque se el numero de comandos que hay, en este caso 14. Aumentaran en practicas consecutivas
 
     for(i=0;i<16;i++){ //Cambiar segun tamaño array
@@ -111,22 +114,45 @@ void hora(){
     printf("%02d:%02d:%02d\n", hor, min, sec);
 }
 
-void printList(tList L) {
-    tPos p;
-    tItem d;
+void printListH(tListH L){
+    for (tPosH i = firstH(L); i != NULL; i = nextH(i, L)) {
+            tItemH comando = getItemH(i, L);
+            printf("%d->%s\n", comando.id, comando.nombre);
+        }
+}
 
-    for (p = first(L); p != NULL; p = next(p, L)) {
-        d = getItem(p, L);
+void hist(tListH *historial, char *trozos[]) {
+    if (trozos[1] == NULL) {
+        // Si no se proporciona ninguna opción, muestra todo el historial
+        printListH(*historial);
+    } else if (strcmp(trozos[1], "-c") == 0) {
+        deleteListH(historial);
+    } else if (strcmp(trozos[1], "-N") == 0 && trozos[2] != NULL) {
+        int N = atoi(trozos[2]);
+        tPosH n = findItemH(N, *historial);
+        for (tPosH i = firstH(*historial); i != n; i = nextH(i, *historial)) {
+            tItemH comando = getItemH(i, *historial);
+            printf("%d->%s\n", comando.id, comando.nombre);
+        }
+    }
+}
+
+void printListF(tListF L) {
+    tPosF p;
+    tItemF d;
+
+    for (p = firstF(L); p != NULL; p = nextF(p, L)) {
+        d = getItemF(p, L);
         printf("descriptor: %d -> %s %s\n", d.df, d.nombre, d.mode);
     }
 }
 
-void Cmd_open (char * tr[], tList *L) {
+void Cmd_open (char * tr[], tListF *L) {
     int i, df, mode = 0;
-    tItem d;
+    tItemF d;
 
     if (tr[1] == NULL) { /*no hay parametro*/
-        printList(*L);
+        printListF(*L);
         return;
     }
     for (i = 2; tr[i] != NULL; i++) {
@@ -177,12 +203,12 @@ void Cmd_open (char * tr[], tList *L) {
         }
         d.df=df;
         strcpy(d.nombre,tr[1]);
-        insertItem(d,L);
+        insertItemF(d,L);
         printf("Anadida entrada %d a la tabla ficheros abiertos\n",df);
     }
 }
 
-void Cmd_close(char *tr[], tList *L){
+void Cmd_close(char *tr[], tListF *L){
     int df;
 
     if(tr[1]!=NULL){
@@ -190,28 +216,28 @@ void Cmd_close(char *tr[], tList *L){
     }
 
     if ((tr[1]==NULL) || (df<0)) { //no hay parametro
-        printList(*L); //o el descriptor es menor que 0
+        printListF(*L); //o el descriptor es menor que 0
         return;
     }
     if (close(df)==-1)
         perror("Imposible cerrar descriptor");
-    else deleteAtPosition(findItem(df, *L), L);
+    else deleteAtPositionF(findItemF(df, *L), L);
 }
 
-void Cmd_dup (char * tr[], tList *L){
+void Cmd_dup (char * tr[], tListF *L){
     int df, dfdup;
     char aux[4096], *p=malloc(1000);
-    tItem d, j;
+    tItemF d, j;
 
     if(tr[1]!=NULL){
         df=atoi(tr[1]);
     }
     if ((tr[1]==NULL) || (df<0)) { //no hay parametro
-        printList(*L); //o el descriptor es menor que 0
+        printListF(*L); //o el descriptor es menor que 0
         return;
     }
 
-    d=getItem(findItem(df,*L),*L);
+    d=getItemF(findItemF(df,*L),*L);
     strcpy(p,d.nombre);
     sprintf (aux,"dup %d (%s)",df, p);
 
@@ -223,7 +249,7 @@ void Cmd_dup (char * tr[], tList *L){
     strcpy(j.mode,""); //Sin modo de apertura
     j.df=dfdup;
     strcpy(j.nombre,aux);
-    insertItem(j,L);
+    insertItemF(j,L);
 
     free(p);
 }
@@ -235,11 +261,76 @@ void infosys(){
     printf("%s (%s) %s-%s %s\n",infosys.nodename,infosys.machine,infosys.sysname,infosys.release,infosys.version);
 }
 
+void help(char *trozos[]) {
+  //Faltan las descripciones xd
+    if (trozos[1] == NULL) {
+        printf("help [cmd] ayuda sobre comandos\nComandos disponibles:\n");
+        printf("authors [-l|-n]\n");
+        printf("pid [-p]\n");
+        printf("chdir [dir]\n");
+        printf("date\n");
+        printf("time\n");
+        printf("hist [-c|-N]\n");
+        printf("comand N\n");
+        printf("open [file] mode\n");
+        printf("close [df]\n");
+        printf("dup [df]\n");
+        printf("listopen\n");
+        printf("infosys\n");
+        printf("help [cmd]\n");
+        printf("quit\n");
+        printf("exit\n");
+        printf("bye\n");
+    } else {
+        if (strcmp(trozos[1], "authors") == 0) {
+            printf("authors: \n");
+            printf("authors -l: \n");
+            printf("authors -n: \n");
+        } else if (strcmp(trozos[1], "pid") == 0) {
+            printf("pid: \n");
+            printf("pid -p: \n");
+        } else if (strcmp(trozos[1], "chdir") == 0) {
+            printf("chdir [dir]: \n");
+        } else if (strcmp(trozos[1], "date") == 0) {
+            printf("date: \n");
+        } else if (strcmp(trozos[1], "time") == 0) {
+            printf("time: \n");
+        } else if (strcmp(trozos[1], "hist") == 0) {
+            printf("hist: \n");
+            printf("hist -c: \n");
+            printf("hist -N: \n");
+        } else if (strcmp(trozos[1], "comand") == 0) {
+            printf("comand N: \n");
+        } else if (strcmp(trozos[1], "open") == 0) {
+            printf("open [file] mode: \n");
+        } else if (strcmp(trozos[1], "close") == 0) {
+            printf("close [df]: \n");
+        } else if (strcmp(trozos[1], "dup") == 0) {
+            printf("dup [df]: \n");
+        } else if (strcmp(trozos[1], "listopen") == 0) {
+            printf("listopen: \n");
+        } else if (strcmp(trozos[1], "infosys") == 0) {
+            printf("infosys: \n");
+        } else if (strcmp(trozos[1], "help") == 0) {
+            printf("help: \n");
+            printf("help [cmd]: \n");
+        } else if (strcmp(trozos[1], "quit") == 0) {
+            printf("quit: \n");
+        } else if (strcmp(trozos[1], "exit") == 0) {
+            printf("exit: \n");
+        } else if (strcmp(trozos[1], "bye") == 0) {
+            printf("bye: \n");
+        } else {
+            printf("%s no encontrado\n",trozos[1]);
+        }
+    }
+}
+
 void salir(bool *terminado){
     *terminado=1;
 }
 
-void procesarComando(int comando, char *trozos[], bool *terminado, tList *L){
+void procesarComando(int comando, char *trozos[], bool *terminado, tListF *L, tListH *H){
     switch(comando){
         case 0:
             authors(trozos);
@@ -257,10 +348,10 @@ void procesarComando(int comando, char *trozos[], bool *terminado, tList *L){
             hora();
             break;
         case 5:
-            printf("Comando 5\n");
+            hist(H,trozos);
             break;
         case 6:
-            printf("Comando 6\n");
+            comandN(trozos,H,terminado,L);
             break;
         case 7:
             Cmd_open(trozos, L);
@@ -272,13 +363,13 @@ void procesarComando(int comando, char *trozos[], bool *terminado, tList *L){
             Cmd_dup(trozos, L);
             break;
         case 10:
-            printList(*L);
+            printListF(*L);
             break;
         case 11:
             infosys();
             break;
         case 12:
-            printf("Comando 12\n");
+            help(trozos);
             break;
         case 13:
             salir(terminado);
@@ -290,63 +381,102 @@ void procesarComando(int comando, char *trozos[], bool *terminado, tList *L){
             salir(terminado);
             break;
         default:
-            printf("Comando desconocido\n");
+            printf("No ejecutado: No such file or directory\n");
             break;
     }
 }
 
-void insertarESstd(tList *L){
-    tItem stdin, stdout, stderr;
+void insertarESstd(tListF *L){
+    tItemF stdin, stdout, stderr;
 
     //stdin
     stdin.df=STDIN_FILENO;
     strcpy(stdin.mode,"O_RDWR");
     strcpy(stdin.nombre,"entrada estandar");
-    insertItem(stdin,L);
+    insertItemF(stdin,L);
 
     //stdout
     stdout.df=STDOUT_FILENO;
     strcpy(stdout.mode,"O_RDWR");
     strcpy(stdout.nombre,"salida estandar");
-    insertItem(stdout,L);
+    insertItemF(stdout,L);
 
     //stderr
     stderr.df=STDERR_FILENO;
     strcpy(stderr.mode,"O_RDWR");
     strcpy(stderr.nombre,"error estandar");
-    insertItem(stderr,L);
+    insertItemF(stderr,L);
 }
 
-void listMemFree(tList *L){
-    while(!isEmptyList(*L)) deleteAtPosition(first(*L),L);
+void listMemFree(tListF *L){
+    while(!isEmptyListF(*L)) deleteAtPositionF(firstF(*L),L);
+}
+
+void insertarComandoHist(tListH *L, char *comando){
+    tItemH p, r;
+
+    if(isEmptyListH(*L)){
+        p.id=0;
+    }
+    else{
+        r=getItemH(lastH(*L),*L);
+        p.id=r.id+1;
+    }
+
+    strcpy(p.nombre, comando);
+
+    insertItemH(p,L);
 }
 
 int main(){
     bool terminado=0;
     char *comando=malloc(100);
+    char *comandoCompleto=malloc(100);
     char **trozos=malloc(100);
     int eleccionComando;
-    tList L;
+    tListF L;
+    tListH H;
 
-    createEmptyList(&L);
+    createEmptyListF(&L);
     insertarESstd(&L);
 
+    createEmptyListH(&H);
 
     while(!terminado){
         imprimirPrompt();
         leerComando(comando);
+        //Formato para hist
+        strcpy(comandoCompleto,comando);
+        strtok(comandoCompleto,"\n");
+        //Formato para hist
         TrocearCadena(comando, trozos);
         eleccionComando=elegirComando(trozos[0]);
-        //Aqui insertase na lista historial o comando
-        procesarComando(eleccionComando, trozos, &terminado, &L);
+        insertarComandoHist(&H, comandoCompleto);
+        procesarComando(eleccionComando, trozos, &terminado, &L, &H);
     }
 
     //printf("Numero de trozos del comando: %d\n",TrocearCadena(comando, trozos));
     //printf("Comando %s. argumento %s\n",comando,trozos[1]);
 
     listMemFree(&L);
+    deleteListH(&H);
     free(comando);
     free(trozos);
+    free(comandoCompleto);
 
     return 0;
+}
+
+void comandN(char *trozos[], tListH *H, bool *terminado, tListF *L){
+
+    if(trozos[1]==NULL){
+        printListH(*H);
+    }
+    else{
+        tItemH p=getItemH(findItemH(atoi(trozos[1]),*H),*H);
+        
+        TrocearCadena(p.nombre,trozos);
+        procesarComando(elegirComando(trozos[0]),trozos,terminado, L, H);
+
+    }
 }

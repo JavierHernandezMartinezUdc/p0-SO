@@ -2,26 +2,26 @@
 #define P0_SHELLOPENFILES_H
 #include <stdbool.h>
 
-typedef struct tItem{
+typedef struct tItemF{
     int df;
     char nombre[4096]; //tamaño maximo de una ruta en linux
     char mode[9]; //nombre de modo mas largo
-} tItem;
+} tItemF;
 
-typedef struct tNode* tPos;
-struct tNode{
-    tPos next;
-    tItem data;
+typedef struct tNodeF* tPosF;
+struct tNodeF{
+    tPosF next;
+    tItemF data;
 };
-typedef tPos tList;
+typedef tPosF tListF;
 
-void createEmptyList(tList *L);
-bool isEmptyList(tList L);
-bool insertItem(tItem d, tList *L);
-void deleteAtPosition(tPos p, tList *L);
-tPos findItem(int df, tList L);
-tPos first(tList L);
-tPos next(tPos p, tList L);
-tItem getItem(tPos p, tList L);
+void createEmptyListF(tListF *L);
+bool isEmptyListF(tListF L);
+bool insertItemF(tItemF d, tListF *L);
+void deleteAtPositionF(tPosF p, tListF *L);
+tPosF findItemF(int df, tListF L);
+tPosF firstF(tListF L);
+tPosF nextF(tPosF p, tListF L);
+tItemF getItemF(tPosF p, tListF L);
 
 #endif //P0_SHELLOPENFILES_H
