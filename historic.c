@@ -42,7 +42,7 @@ tItemH getItemH(tPosH p, tListH L) {
 bool isEmptyListH(tListH L) {
     return (L == NULL);
 }
-
+/*
 void deleteAtPositionH(tPosH p, tListH *L) {
     tPosH q;
     if(p == firstH(*L)) {
@@ -61,7 +61,7 @@ void deleteAtPositionH(tPosH p, tListH *L) {
     free(p);
     p = NULL;
 }
-
+*/
 bool createNodeH(tPosH *p) {
     *p = malloc(sizeof(**p));
     return *p != NULL;
