@@ -53,9 +53,9 @@ void authors(char *trozos[]){
     }
     else {
         if (strcmp(trozos[1], "-l") == 0) {
-            printf("javier.hernandez.martinez@udc.es\npaula.carril@udc.es\n"); //TODO revisar login paula
+            printf("javier.hernandez.martinez@udc.es\npaula.carril@udc.es\n");
         } else if (strcmp(trozos[1], "-n") == 0) {
-            printf("Javier Hernandez Martinez\nPaula Carril Gontan\n"); //TODO revisar nombre paula
+            printf("Javier Hernandez Martinez\nPaula Carril Gontan\n");
         }
     }
 }
