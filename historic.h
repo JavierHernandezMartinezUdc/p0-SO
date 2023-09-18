@@ -2,7 +2,7 @@
 #define LIST_H
 #include <stdbool.h>
 
-#define NAME_LENGTH_LIMIT 25
+#define NAME_LENGTH_LIMIT 100
 
 typedef struct tItemH {
     int id;
