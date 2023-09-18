@@ -123,11 +123,13 @@ void printListH(tListH L){
 
 void hist(tListH *historial, char *trozos[]) {
     if (trozos[1] == NULL) {
-        // Si no se proporciona ninguna opción, muestra todo el historial
+        //Muestra el historial
         printListH(*historial);
     } else if (strcmp(trozos[1], "-c") == 0) {
+        //Borra el historial
         deleteListH(historial);
     } else if (strcmp(trozos[1], "-N") == 0 && trozos[2] != NULL) {
+        //Busca un id en el historial
         int N = atoi(trozos[2]);
         tPosH n = findItemH(N, *historial);
         for (tPosH i = firstH(*historial); i != n; i = nextH(i, *historial)) {
