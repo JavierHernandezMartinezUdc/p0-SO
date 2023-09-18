@@ -6,7 +6,7 @@
 #include <time.h>
 #include <sys/utsname.h> //Utilizase en infosys
 #include "shellopenfiles.h"
-#include <fcntl.h> //utilizase en open
+#include <fcntl.h> //Utilizase en open
 #include "historic.h"
 
 void comandN(char *trozos[], tListH *H, bool *terminado, tListF *L);
@@ -262,7 +262,7 @@ void infosys(){
 }
 
 void help(char *trozos[]) {
-  //Faltan las descripciones xd
+  //Faltan las descripciones xd xd
     if (trozos[1] == NULL) {
         printf("help [cmd] ayuda sobre comandos\nComandos disponibles:\n");
         printf("authors [-l|-n]\n");
