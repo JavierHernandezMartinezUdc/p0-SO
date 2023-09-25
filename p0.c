@@ -173,11 +173,7 @@ void Cmd_open (char * tr[], tListF *L) {
     }
     else {
         //mapeo de modos de apertura
-        if(tr[2]==NULL){
-            strcpy(d.mode,"");
-        }
-        else{
-            switch (mode) {
+        switch (mode) {
                 case O_CREAT:
                     strcpy(d.mode,"O_CREAT");
                     break;
@@ -185,7 +181,7 @@ void Cmd_open (char * tr[], tListF *L) {
                     strcpy(d.mode,"O_EXCL");
                     break;
                 case O_RDONLY:
-                    strcpy(d.mode,"O_RDONLY");
+                    strcpy(d.mode,""); //En modo O_RDONLY no se imprime nada
                     break;
                 case O_WRONLY:
                     strcpy(d.mode,"O_WRONLY");
@@ -202,7 +198,6 @@ void Cmd_open (char * tr[], tListF *L) {
                 default:
                     strcpy(d.mode,"Desconocido");
             }
-        }
         d.df=df;
         strcpy(d.nombre,tr[1]);
         insertItemF(d,L);
