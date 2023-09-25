@@ -264,7 +264,7 @@ void infosys(){
 }
 
 void help(char *trozos[]) {
-  //Faltan las descripciones xd xd
+    //Faltan las descripciones xd xd
     if (trozos[1] == NULL) {
         printf("help [cmd] ayuda sobre comandos\nComandos disponibles:\n");
         printf("authors [-l|-n]\n");
@@ -324,56 +324,10 @@ void help(char *trozos[]) {
         } else if (strcmp(trozos[1], "bye") == 0) {
             printf("bye: Termina la shell\n");
         } else {
-            printf("%s no encontrado\n",trozos[1]);
+            printf("%s no encontrado\n", trozos[1]);
         }
     }
 }
-
-autores [-l|-n] Imprime los nombres y los inicios de sesión de los autores del programa. autores -l impresiones
-solo los inicios de sesión y los autores -n imprime solo los nombres
-        pid [-p] Imprime el pid del proceso que ejecuta el shell. pid -p imprime el pid
-del proceso padre del shell.
-chdir [dir] Cambia el directorio de trabajo actual del shell a dir (usando el
-                                                                    llamada al sistema chdir). Cuando se invoca sin aumentos, imprime el
-directorio de trabajo actual (usando la llamada al sistema getcwd.
-fecha Imprime la fecha actual en el formato DD/MM/AAAA
-        hora Imprime la hora actual en el formato hh:mm:ss.
-hist [-c|-N] Muestra/borra el histórico de comandos ejecutados por este shell. En orden
-Para hacer esto, se debe crear una lista para almacenar todos los comandos ingresados al shell.
-implementado. hist -c borra el histórico, es decir, vacía la lista
-– hist Imprime todos los comandos que se han ingresado con su orden
-número
-– hist -c Borra (vacía) la lista de comandos históricos
-– hist -N Imprime los primeros N comandos
-Los estudiantes son libres de decidir si los comandos de numeración de estrellas hist
-en 0 o en 1. Hipotéticamente, existe un escenario en el que intentar repetir
-un comando histórico podría producir un bucle infinito o un desbordamiento de pila
-(dependiendo de cómo esté codificado), por lo que los estudiantes pueden optar por no almacenar
-llamados a autocomandarse en la lista histórica si así lo desean (tal escenario
-        sería comando 9 en el ejemplo anterior) (Ver las NOTAS SOBRE
-LISTA DE IMPLEMENTACIONES al final de este documento)
-comando N Repite el comando número N (de la lista histórica)
-modo abrir [archivo] Abre un archivo y lo agrega (junto con el descriptor del archivo y el
-                                                  modo de apertura a la lista de archivos abiertos del shell. Para el modo usaremos cr para
-O CREAT, ap para O APPEND, ex para O EXCL, ro para O RDONLY,
-rw para O RDWR, wo para O WRONLY y tr para O TRUNC. El PRO-
-El archivo proporcionado ayudaP0.c proporciona código que se puede utilizar para esta práctica de laboratorio.
-asignación
-        close [df ] Cierra el descriptor del archivo df y elimina el elemento correspondiente de
-la lista
-dup [df ] Duplica el descriptor del archivo df (usando la llamada al sistema dup, creando el
-                                                nueva entrada correspondiente en la lista de archivos
-                                                listopen Enumera los archivos abiertos del shell. Para cada archivo enumera su descriptor, el archivo
-        nombre y modo de apertura. El shell heredará de su padre.
-procesa los descriptores abiertos 0, 1 y 2 (stdin, stout y stderr). Llegar
-        el modo de apertura desde un descriptor (df) podemos usar fcntl(fd,F GETFL).
-infosys Imprime información en la máquina que ejecuta el shell (obtenida a través de
-                                                                la llamada al sistema/función de biblioteca uname)
-ayuda [cmd] ayuda muestra una lista de comandos disponibles. ayuda cmd da una breve ayuda
-sobre el uso del comando cmd
-quit Finaliza el shell
-exit Finaliza el shell
-adios termina la ella
 
 void salir(bool *terminado){
     *terminado=1;
