@@ -285,48 +285,95 @@ void help(char *trozos[]) {
         printf("bye\n");
     } else {
         if (strcmp(trozos[1], "authors") == 0) {
-            printf("authors: \n");
-            printf("authors -l: \n");
-            printf("authors -n: \n");
+            printf("authors: muestra los nombres y los inicios de sesión de los autores del programa\n");
+            printf("authors -l: muesta solo los inicios de sesión\n");
+            printf("authors -n: muestra solo los nombre\n");
         } else if (strcmp(trozos[1], "pid") == 0) {
-            printf("pid: \n");
-            printf("pid -p: \n");
+            printf("pid: Muestra el pid del proceso que ejecuta el shell\n");
+            printf("pid -p: Muestra el pid del proceso padre del shell\n");
         } else if (strcmp(trozos[1], "chdir") == 0) {
-            printf("chdir [dir]: \n");
+            printf("chdir [dir]: Cambia el directorio de trabajo actual del shell a dir\n");
+            printf("chdir: Muestra el directorio de trabajo actual\n");
         } else if (strcmp(trozos[1], "date") == 0) {
-            printf("date: \n");
+            printf("date: Muestra la data actual\n");
         } else if (strcmp(trozos[1], "time") == 0) {
-            printf("time: \n");
+            printf("time: Muestra la hora actual\n");
         } else if (strcmp(trozos[1], "hist") == 0) {
-            printf("hist: \n");
-            printf("hist -c: \n");
-            printf("hist -N: \n");
+            printf("hist: Muestra el historial de comandos ejecutados por el shell\n");
+            printf("hist -c: Borra el historial\n");
+            printf("hist -N: Muestra los N primeros comandos en el historial\n");
         } else if (strcmp(trozos[1], "comand") == 0) {
-            printf("comand N: \n");
+            printf("comand N: Repite el comando numero N del historial\n");
         } else if (strcmp(trozos[1], "open") == 0) {
-            printf("open [file] mode: \n");
+            printf("open [file] mode: Abre un archivo y lo añade a la lista de archivos abiertos\n");
         } else if (strcmp(trozos[1], "close") == 0) {
-            printf("close [df]: \n");
+            printf("close [df]: cierra el df y elimina su archivo correspondienta\n");
         } else if (strcmp(trozos[1], "dup") == 0) {
-            printf("dup [df]: \n");
+            printf("dup [df]: duplica el df y crea un nuevo archivo\n");
         } else if (strcmp(trozos[1], "listopen") == 0) {
-            printf("listopen: \n");
+            printf("listopen: Lista los archivos abiertos con su df y modo\n");
         } else if (strcmp(trozos[1], "infosys") == 0) {
-            printf("infosys: \n");
+            printf("infosys: Muestra informacion de la maquina ejecutando la shell\n");
         } else if (strcmp(trozos[1], "help") == 0) {
-            printf("help: \n");
-            printf("help [cmd]: \n");
+            printf("help: Lista los comandos disponibles\n");
+            printf("help [cmd]: Da una breve descipcion del comando especificado\n");
         } else if (strcmp(trozos[1], "quit") == 0) {
-            printf("quit: \n");
+            printf("quit: Termina la shell\n");
         } else if (strcmp(trozos[1], "exit") == 0) {
-            printf("exit: \n");
+            printf("exit: Termina la shell\n");
         } else if (strcmp(trozos[1], "bye") == 0) {
-            printf("bye: \n");
+            printf("bye: Termina la shell\n");
         } else {
             printf("%s no encontrado\n",trozos[1]);
         }
     }
 }
+
+autores [-l|-n] Imprime los nombres y los inicios de sesión de los autores del programa. autores -l impresiones
+solo los inicios de sesión y los autores -n imprime solo los nombres
+        pid [-p] Imprime el pid del proceso que ejecuta el shell. pid -p imprime el pid
+del proceso padre del shell.
+chdir [dir] Cambia el directorio de trabajo actual del shell a dir (usando el
+                                                                    llamada al sistema chdir). Cuando se invoca sin aumentos, imprime el
+directorio de trabajo actual (usando la llamada al sistema getcwd.
+fecha Imprime la fecha actual en el formato DD/MM/AAAA
+        hora Imprime la hora actual en el formato hh:mm:ss.
+hist [-c|-N] Muestra/borra el histórico de comandos ejecutados por este shell. En orden
+Para hacer esto, se debe crear una lista para almacenar todos los comandos ingresados al shell.
+implementado. hist -c borra el histórico, es decir, vacía la lista
+– hist Imprime todos los comandos que se han ingresado con su orden
+número
+– hist -c Borra (vacía) la lista de comandos históricos
+– hist -N Imprime los primeros N comandos
+Los estudiantes son libres de decidir si los comandos de numeración de estrellas hist
+en 0 o en 1. Hipotéticamente, existe un escenario en el que intentar repetir
+un comando histórico podría producir un bucle infinito o un desbordamiento de pila
+(dependiendo de cómo esté codificado), por lo que los estudiantes pueden optar por no almacenar
+llamados a autocomandarse en la lista histórica si así lo desean (tal escenario
+        sería comando 9 en el ejemplo anterior) (Ver las NOTAS SOBRE
+LISTA DE IMPLEMENTACIONES al final de este documento)
+comando N Repite el comando número N (de la lista histórica)
+modo abrir [archivo] Abre un archivo y lo agrega (junto con el descriptor del archivo y el
+                                                  modo de apertura a la lista de archivos abiertos del shell. Para el modo usaremos cr para
+O CREAT, ap para O APPEND, ex para O EXCL, ro para O RDONLY,
+rw para O RDWR, wo para O WRONLY y tr para O TRUNC. El PRO-
+El archivo proporcionado ayudaP0.c proporciona código que se puede utilizar para esta práctica de laboratorio.
+asignación
+        close [df ] Cierra el descriptor del archivo df y elimina el elemento correspondiente de
+la lista
+dup [df ] Duplica el descriptor del archivo df (usando la llamada al sistema dup, creando el
+                                                nueva entrada correspondiente en la lista de archivos
+                                                listopen Enumera los archivos abiertos del shell. Para cada archivo enumera su descriptor, el archivo
+        nombre y modo de apertura. El shell heredará de su padre.
+procesa los descriptores abiertos 0, 1 y 2 (stdin, stout y stderr). Llegar
+        el modo de apertura desde un descriptor (df) podemos usar fcntl(fd,F GETFL).
+infosys Imprime información en la máquina que ejecuta el shell (obtenida a través de
+                                                                la llamada al sistema/función de biblioteca uname)
+ayuda [cmd] ayuda muestra una lista de comandos disponibles. ayuda cmd da una breve ayuda
+sobre el uso del comando cmd
+quit Finaliza el shell
+exit Finaliza el shell
+adios termina la ella
 
 void salir(bool *terminado){
     *terminado=1;
