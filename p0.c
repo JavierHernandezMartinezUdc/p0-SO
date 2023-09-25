@@ -471,10 +471,18 @@ void comandN(char *trozos[], tListH *H, bool *terminado, tListF *L){
         printListH(*H);
     }
     else{
-        tItemH p=getItemH(findItemH(atoi(trozos[1]),*H),*H);
-        
-        TrocearCadena(p.nombre,trozos);
-        procesarComando(elegirComando(trozos[0]),trozos,terminado, L, H);
+        int i=atoi(trozos[1]);
+        tPosH q=findItemH(i,*H);
 
+        if(q==NULL){
+            printf("No hay elemento %i en el historico\n",i);
+        }
+        else{
+            tItemH p=getItemH(q,*H);
+        
+            TrocearCadena(p.nombre,trozos);
+            printf("Ejecutando el hist (%d): %s\n",i,trozos[0]);
+            procesarComando(elegirComando(trozos[0]),trozos,terminado, L, H);
+        }
     }
 }
