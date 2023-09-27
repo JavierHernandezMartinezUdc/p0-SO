@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <math.h>
 #include <string.h>
 #include <time.h>
 #include <sys/utsname.h> //Utilizase en infosys
@@ -122,19 +123,21 @@ void printListH(tListH L){
 }
 
 void hist(tListH *historial, char *trozos[]) {
-    if (trozos[1] == NULL) {
+    if (trozos[1] == NULL || trozos[1][0]!='-') {
         //Muestra el historial
         printListH(*historial);
     } else if (strcmp(trozos[1], "-c") == 0) {
         //Borra el historial
         deleteListH(historial);
-    } else if (strcmp(trozos[1], "-N") == 0 && trozos[2] != NULL) {
-        //Busca un id en el historial
-        int N = atoi(trozos[2]);
-        tPosH n = findItemH(N, *historial);
-        for (tPosH i = firstH(*historial); i != n; i = nextH(i, *historial)) {
-            tItemH comando = getItemH(i, *historial);
-            printf("%d->%s\n", comando.id, comando.nombre);
+    } else{
+        char N[strlen(trozos[1])-1];
+        int n = atoi(strcpy(N, trozos[1]+1));
+        if(n >= 0 && n <= getItemH(lastH(*historial),*historial).id){
+            tPosH  x = findItemH(n, *historial);
+            for (tPosH i = firstH(*historial); i != x; i = nextH(i, *historial)) {
+                tItemH comando = getItemH(i, *historial);
+                printf("%d->%s\n", comando.id, comando.nombre);
+            }
         }
     }
 }
