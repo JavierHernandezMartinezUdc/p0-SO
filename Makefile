@@ -1,8 +1,7 @@
 todo: borrar compilar ejecutar
 
 p0.o:
-	gcc -c p0.c
-# Preguntar -g
+	gcc -c -g p0.c
 
 listaF.o:
 	gcc -c shellopenfiles.c

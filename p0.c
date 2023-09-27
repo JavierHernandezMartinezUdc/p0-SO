@@ -221,7 +221,9 @@ void Cmd_close(char *tr[], tListF *L){
     }
     if (close(df)==-1)
         perror("Imposible cerrar descriptor");
-    else deleteAtPositionF(findItemF(df, *L), L);
+    else {
+        deleteAtPositionF(findItemF(df, *L), L);
+    }
 }
 
 void Cmd_dup (char * tr[], tListF *L){
@@ -234,9 +236,13 @@ void Cmd_dup (char * tr[], tListF *L){
     }
     if ((tr[1]==NULL) || (df<0)) { //no hay parametro
         printListF(*L); //o el descriptor es menor que 0
+        free(p);
         return;
     }
-
+    if(findItemF(df,*L)==NULL){
+        free(p);
+        return;
+    }
     d=getItemF(findItemF(df,*L),*L);
     strcpy(p,d.nombre);
     sprintf (aux,"dup %d (%s)",df, p);
@@ -446,7 +452,8 @@ int main(){
     while(!terminado){
         imprimirPrompt();
         leerComando(comando);
-        //Formato para hist
+        if(strcmp(comando,"\n")!=0){
+            //Formato para hist
         strcpy(comandoCompleto,comando);
         strtok(comandoCompleto,"\n");
         //Formato para hist
@@ -454,6 +461,7 @@ int main(){
         eleccionComando=elegirComando(trozos[0]);
         insertarComandoHist(&H, comandoCompleto);
         procesarComando(eleccionComando, trozos, &terminado, &L, &H);
+        }
     }
 
     //printf("Numero de trozos del comando: %d\n",TrocearCadena(comando, trozos));
