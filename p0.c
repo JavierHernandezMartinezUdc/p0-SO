@@ -36,7 +36,7 @@ void leerComando(char *comando){
 int elegirComando(char *comando){
     int i;
     char *comandosDisponibles[16]={"authors","pid","chdir","date","time","hist","command","open","close","dup","listopen","infosys","help","bye","exit","quit"};
-    //16 de tamaño porque se el numero de comandos que hay, en este caso 14. Aumentaran en practicas consecutivas
+    //16 de tamaño porque se el numero de comandos que hay, en este caso 16. Aumentaran en practicas consecutivas
 
     for(i=0;i<16;i++){ //Cambiar segun tamaño array
         if(strcmp(comando,comandosDisponibles[i])==0){
