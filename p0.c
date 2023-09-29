@@ -481,6 +481,9 @@ void comandN(char *trozos[], tListH *H, bool *terminado, tListF *L){
     if(trozos[1]==NULL){
         printListH(*H);
     }
+    else if(strcmp(trozos[1],"0")==0){
+        printf("Bucle infinito de command 0. No se ejecutará\n");
+    }
     else{
         int i=atoi(trozos[1]);
         tPosH q=findItemH(i,*H);
