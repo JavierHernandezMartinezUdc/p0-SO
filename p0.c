@@ -155,6 +155,7 @@ void printListF(tListF L) {
 void Cmd_open (char * tr[], tListF *L) {
     int i, df, mode = 0;
     tItemF d;
+    bool primerModo=true;
 
     if (tr[1] == NULL) { /*no hay parametro*/
         printListF(*L);
@@ -175,32 +176,56 @@ void Cmd_open (char * tr[], tListF *L) {
         perror("Imposible abrir fichero");
     }
     else {
-        //mapeo de modos de apertura
-        switch (mode) {
-                case O_CREAT:
-                    strcpy(d.mode,"O_CREAT");
-                    break;
-                case O_EXCL:
-                    strcpy(d.mode,"O_EXCL");
-                    break;
-                case O_RDONLY:
-                    strcpy(d.mode,""); //En modo O_RDONLY no se imprime nada
-                    break;
-                case O_WRONLY:
-                    strcpy(d.mode,"O_WRONLY");
-                    break;
-                case O_RDWR:
-                    strcpy(d.mode,"O_RDWR");
-                    break;
-                case O_APPEND:
-                    strcpy(d.mode,"O_APPEND");
-                    break;
-                case O_TRUNC:
-                    strcpy(d.mode,"O_TRUNC");
-                    break;
-                default:
-                    strcpy(d.mode,"Desconocido");
+        strcpy(d.mode,"");
+        if(mode & O_CREAT){
+            if(!primerModo){
+                strcat(d.mode," ");
             }
+            strcat(d.mode,"O_CREAT");
+            primerModo=false;
+        }
+        if(mode & O_EXCL){
+            if(!primerModo){
+                strcat(d.mode," ");
+            }
+            strcat(d.mode,"O_EXCL");
+            primerModo=false;
+        }
+        if(mode & O_RDONLY){
+            if(!primerModo){
+                strcat(d.mode," ");
+            }
+            strcat(d.mode,"O_RDONLY");
+            primerModo=false;
+        }
+        if(mode & O_WRONLY){
+            if(!primerModo){
+                strcat(d.mode," ");
+            }
+            strcat(d.mode,"O_WRONLY");
+            primerModo=false;
+        }
+        if(mode & O_RDWR){
+            if(!primerModo){
+                strcat(d.mode," ");
+            }
+            strcat(d.mode,"O_RDWR");
+            primerModo=false;
+        }
+        if(mode & O_APPEND){
+            if(!primerModo){
+                strcat(d.mode," ");
+            }
+            strcat(d.mode,"O_APPEND");
+            primerModo=false;
+        }
+        if(mode & O_TRUNC){
+            if(!primerModo){
+                strcat(d.mode," ");
+            }
+            strcat(d.mode,"O_TRUNC");
+            primerModo=false;
+        }
         d.df=df;
         strcpy(d.nombre,tr[1]);
         insertItemF(d,L);
@@ -245,6 +270,7 @@ void Cmd_dup (char * tr[], tListF *L){
     }
     d=getItemF(findItemF(df,*L),*L);
     strcpy(p,d.nombre);
+    
     sprintf (aux,"dup %d (%s)",df, p);
 
     dfdup=dup(df);
@@ -252,7 +278,9 @@ void Cmd_dup (char * tr[], tListF *L){
         perror("Imposible duplicar descriptor");
     }
 
-    strcpy(j.mode,""); //Sin modo de apertura
+    if(strstr(d.mode,"O_CREAT")!=NULL){
+        strcpy(j.mode,d.mode+8);
+    }
     j.df=dfdup;
     strcpy(j.nombre,aux);
     insertItemF(j,L);

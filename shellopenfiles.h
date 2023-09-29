@@ -5,7 +5,7 @@
 typedef struct tItemF{
     int df;
     char nombre[4096]; //tamaño maximo de una ruta en linux
-    char mode[9]; //nombre de modo mas largo
+    char mode[100]; //nombre de modo mas largo
 } tItemF;
 
 typedef struct tNodeF* tPosF;
