@@ -9,6 +9,7 @@
 #include "shellopenfiles.h"
 #include <fcntl.h> //Utilizase en open
 #include "historic.h"
+#include "p1.h"
 
 void comandN(char *trozos[], tListH *H, bool *terminado, tListF *L);
 
