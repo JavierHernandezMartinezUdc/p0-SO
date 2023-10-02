@@ -6,6 +6,7 @@ void create(char *trozos[]){
         //Imprime ruta
     }
     else if(strcmp(trozos[1],"-f")==0){
+        //open() df = open(nombreArchivo, O_CREAT | O_WRONLY, 0644);
         //Crear fichero
     }
     else{
