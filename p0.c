@@ -520,14 +520,22 @@ int main(){
 }
 
 void comandN(char *trozos[], tListH *H, bool *terminado, tListF *L){
+    tPosH p;
+    int cnt=0;
 
     if(trozos[1]==NULL){
         printListH(*H);
     }
-    else if(strcmp(trozos[1],"0")==0){
-        printf("Bucle infinito de command 0. No se ejecutará\n");
-    }
     else{
+        if(strcmp(trozos[1],"0")==0){
+            for(p=firstH(*H);p!=NULL;p=nextH(p,*H)){
+            cnt++;
+            }
+            if(cnt==1){
+                printf("Bucle infinito de command 0. No se ejecutará\n");
+                return;
+            }
+        }
         int i=atoi(trozos[1]);
         tPosH q=findItemH(i,*H);
 
