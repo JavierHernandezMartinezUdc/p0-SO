@@ -315,6 +315,11 @@ void help(char *trozos[]) {
         printf("quit\n");
         printf("exit\n");
         printf("bye\n");
+        printf("create\n");
+        printf("stat\n");
+        printf("list\n");
+        printf("delete\n");
+        printf("deltree\n");
     } else {
         if (strcmp(trozos[1], "authors") == 0) {
             printf("authors: muestra los nombres y los inicios de sesión de los autores del programa\n");
@@ -355,6 +360,16 @@ void help(char *trozos[]) {
             printf("exit: Termina la shell\n");
         } else if (strcmp(trozos[1], "bye") == 0) {
             printf("bye: Termina la shell\n");
+        } else if (strcmp(trozos[1], "create") == 0) {
+            printf("create [-f] [name]      Crea un directorio o fichero (-f)"); //2 tabulados
+        } else if (strcmp(trozos[1], "stat") == 0) {
+            printf("stat [-long] [-link] [-acc] name1 name2 ...     lista ficheros;\n      -long: listado largo\n      -acc: accesstime\n      -link: si es enlace simbolico, el path contenido\n"); //2 tabulados
+        } else if (strcmp(trozos[1], "list") == 0) {
+            printf("list [-reca] [-recb] [-hid] [-long] [-link] [-acc] n1 n2 ...        list contenidos de directorios\n        -hid: incluye los ficheros ocultos\n        -recb: recursivo (antes)\n        -reca: recursivo (despues)\n        resto de parametros como stat\n"); //2 tabulados
+        } else if (strcmp(trozos[1], "delete") == 0) {
+            printf("delete [name1 name2 ...]        Borra ficheros o directorios vacios\n"); //2 tabulados
+        } else if (strcmp(trozos[1], "deltree") == 0) {
+            printf("deltree [name1 name2 ...]       Borra ficheros o directorios no vacios recursivamente\n"); //2 tabulados
         } else {
             printf("%s no encontrado\n", trozos[1]);
         }
