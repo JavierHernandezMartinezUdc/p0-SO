@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
-#include <string.h>
 #include <time.h>
 #include <sys/utsname.h> //Utilizase en infosys
 #include "shellopenfiles.h"
