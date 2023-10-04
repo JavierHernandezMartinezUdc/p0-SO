@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <math.h>
 #include <time.h>
 #include <sys/utsname.h> //Utilizase en infosys
@@ -9,6 +8,7 @@
 #include <fcntl.h> //Utilizase en open
 #include "historic.h"
 #include "p1.h"
+#include <stdbool.h>
 
 void comandN(char *trozos[], tListH *H, bool *terminado, tListF *L);
 

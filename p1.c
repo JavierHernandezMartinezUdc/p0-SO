@@ -1,6 +1,5 @@
 #include "p1.h"
 
-
 void create(char *trozos[]){
     if(trozos[1]==NULL){
         //Imprime ruta

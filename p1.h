@@ -15,6 +15,5 @@ void stat(char *trozos[]);
 void list();
 void delete();
 void deltree();
-bool IsEmptyDir();
 
 #endif //P0_P1_H

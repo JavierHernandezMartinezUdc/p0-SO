@@ -3,14 +3,17 @@ todo: borrar compilar ejecutar
 p0.o:
 	gcc -c -g p0.c
 
+p1.o:
+	gcc -c -g p1.c
+
 listaF.o:
 	gcc -c shellopenfiles.c
 
 listaH.o:
 	gcc -c historic.c
 
-compilar: p0.o listaF.o listaH.o
-	gcc -Wall -o p0 p0.o shellopenfiles.o historic.o
+compilar: p0.o p1.o listaF.o listaH.o
+	gcc -Wall -o p0 p0.o p1.o shellopenfiles.o historic.o
 	rm -f *.o
 
 ejecutar:
