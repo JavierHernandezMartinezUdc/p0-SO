@@ -1,14 +1,9 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
 #include <math.h>
 #include <time.h>
 #include <sys/utsname.h> //Utilizase en infosys
 #include "shellopenfiles.h"
-#include <fcntl.h> //Utilizase en open
 #include "historic.h"
 #include "p1.h"
-#include <stdbool.h>
 
 void comandN(char *trozos[], tListH *H, bool *terminado, tListF *L);
 
@@ -35,10 +30,10 @@ void leerComando(char *comando){
 
 int elegirComando(char *comando){
     int i;
-    char *comandosDisponibles[16]={"authors","pid","chdir","date","time","hist","command","open","close","dup","listopen","infosys","help","bye","exit","quit"};
-    //16 de tamaño porque se el numero de comandos que hay. Aumentaran en practicas consecutivas
+    char *comandosDisponibles[21]={"authors","pid","chdir","date","time","hist","command","open","close","dup","listopen","infosys","help","bye","exit","quit","create","stat","list","delete","deltree"};
+    //21 de tamaño porque se el numero de comandos que hay. Aumentaran en practicas consecutivas
 
-    for(i=0;i<16;i++){ //Cambiar segun tamaño array
+    for(i=0;i<21;i++){ //Cambiar segun tamaño array
         if(strcmp(comando,comandosDisponibles[i])==0){
             return i;
         }
@@ -429,6 +424,21 @@ void procesarComando(int comando, char *trozos[], bool *terminado, tListF *L, tL
             break;
         case 15:
             salir(terminado);
+            break;
+        case 16:
+            create(trozos);
+            break;
+        case 17:
+            //stat();
+            break;
+        case 18:
+            //list();
+            break;
+        case 19:
+            //delete();
+            break;
+        case 20:
+            //deltree();
             break;
         default:
             printf("No ejecutado: No such file or directory\n");
