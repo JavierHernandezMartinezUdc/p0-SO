@@ -51,36 +51,49 @@ void create(char *trozos[]){
     }
 }
 
+void getStats(){
+    struct stat stats;
+
+    if(lstat()){
+
+    }
+}
+
 void stats(char *trozos[], int numWords){
     bool largo=false, access=false, enlace=false;
     int i=0;
 
-    if(trozos[1]==NULL){
-        printRoute();
-    }
-    else if(trozos[2]==NULL){
-        printf("hola\n");
-    }
-    else{
-        for(i=1;i<numWords;i++){
-            if(strcmp(trozos[i],"-long")==0){
-                largo=true;
-            }
-            else if(strcmp(trozos[i],"-acc")==0){
-                access=true;
-            }
-            else if(strcmp(trozos[i],"-link")==0){
-                enlace=false;
-            }
-            else{
-                break;
-            }
+    for(i=1;i<numWords;i++){
+        if(strcmp(trozos[i],"-long")==0){
+            largo=true;
+        }
+        else if(strcmp(trozos[i],"-acc")==0){
+            access=true;
+        }
+        else if(strcmp(trozos[i],"-link")==0){
+            enlace=true;
+        }
+        else{
+            break;
         }
     }
-    
-    //i++; //Para saber donde acaban los argumentos. Si hay 1 argumento entonces trozos[2] es fichero e "i" vale 2
-    printf("%d %d %d %d\n",i,largo,access,enlace);
-    
+
+    //i indica aqui el numero de palabras antes de los ficheros, por lo que si i=4 significa que trozos[4] (i) es el primer fichero
+    //En caso de que no haya nombre de fichero entonces imprime la ruta 
+
+    if(trozos[i]==NULL){
+        printRoute();
+    }
+    else{
+        //Aqui se pillan as stats de verdad
+        if(largo){
+            //Stats en formato largo
+        }
+        else{
+            //Stats en formato corto
+            getStats();
+        }
+    }
 }
 
 
