@@ -18,6 +18,10 @@ char LetraTF (mode_t m);
 char *ConvierteModo2 (mode_t m);
 int TrocearCadena(char* cadena, char* trozos[]);
 
+//list
+#include <dirent.h>
+#include <libgen.h>
+
 void create(char *trozos[]);
 //create ruta
 //create -f name crea un fichero
@@ -28,7 +32,10 @@ void stats(char *trozos[], int numWords);
 //stat -link si es enlace simbolico, el path contenido
 //stat ruta
 void list();
+
 void delete();
+
 void deltree();
+
 
 #endif //P0_P1_H

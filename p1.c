@@ -195,7 +195,64 @@ void stats(char *trozos[], int numWords){
 }
 
 
-void list();
+void list(char *trozos[]){
+    DIR *dp;
+    struct dirent *entry;
+    int subcommand,noncommand;
+    int x=1,l,i;
+    if(trozos[1]==NULL){
+        printRoute();
+        //directorio actual
+    }
+    else if(trozos[1][0]!='-'){
+        //lista nombre del directorio escrito y lo que tiene dentro y sus tamaños
+
+        dp = opendir(printRoute());  // Abre el directorio especificado
+        if (dp == NULL) {
+            perror("Error al abrir el directorio");
+            return;
+        }
+        //Lee lo que hay dentro
+        printf("%s:\n", dirPath);
+        while ((entry = readdir(dp)) != NULL) {
+            printf("%s\n", entry->d_name);
+        }
+
+        //Lo cierra
+        closedir(dp);
+    }
+    else {
+        for(l=0; trozos[l][0]=='-'; l++){
+            noncommand = l+1;
+        }
+        while(x<noncommand) {
+            char *commandlist[6] = {"-hid", "-recb", "-reca", "-long", "-acc", "-link"};
+            for (i = 0; i <= 6; i++) {
+                if (strcmp(trozos[x], commandlist[i]) == 0) {
+                    subcommand = i;
+                }
+            }
+            //el archivo que se escribe tiene que estar dentro del directorio actual si es anterio da error
+
+            switch (subcommand) {
+                case 0:
+                    //lista nombre directorio todo lo que tiene dentro y sus tamaños y todo lo que tienen dentro los archivos q tiene dentro
+                    //lo mismo pero en distinto orden
+                    break;
+                case 1:
+                    //lista nombre directorio todo lo que tiene dentro y sus tamaños y todo lo que tienen dentro los archivos q tiene dentro
+                    break;
+                case 2:
+                    break;
+                case 3,4,5:
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+}
+
 
 
 void delete();
