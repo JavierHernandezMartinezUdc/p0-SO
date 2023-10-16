@@ -1,5 +1,4 @@
 #include <math.h>
-#include <time.h>
 #include <sys/utsname.h> //Utilizase en infosys
 #include "shellopenfiles.h"
 #include "historic.h"

@@ -1,5 +1,39 @@
 #include "p1.h"
 
+char LetraTF (mode_t m){
+     switch (m&__S_IFMT) { /*and bit a bit con los bits de formato,0170000 */
+        case __S_IFSOCK: return 's'; /*socket */
+        case __S_IFLNK: return 'l'; /*symbolic link*/
+        case __S_IFREG: return '-'; /* fichero normal*/
+        case __S_IFBLK: return 'b'; /*block device*/
+        case __S_IFDIR: return 'd'; /*directorio */ 
+        case __S_IFCHR: return 'c'; /*char device*/
+        case __S_IFIFO: return 'p'; /*pipe*/
+        default: return '?'; /*desconocido, no deberia aparecer*/
+     }
+}
+
+char *ConvierteModo2 (mode_t m){
+    static char permisos[12];
+    strcpy (permisos,"---------- ");
+    
+    permisos[0]=LetraTF(m);
+    if (m&S_IRUSR) permisos[1]='r';    /*propietario*/
+    if (m&S_IWUSR) permisos[2]='w';
+    if (m&S_IXUSR) permisos[3]='x';
+    if (m&S_IRGRP) permisos[4]='r';    /*grupo*/
+    if (m&S_IWGRP) permisos[5]='w';
+    if (m&S_IXGRP) permisos[6]='x';
+    if (m&S_IROTH) permisos[7]='r';    /*resto*/
+    if (m&S_IWOTH) permisos[8]='w';
+    if (m&S_IXOTH) permisos[9]='x';
+    if (m&S_ISUID) permisos[3]='s';    /*setuid, setgid y stickybit*/
+    if (m&S_ISGID) permisos[6]='s';
+    if (m&__S_ISVTX) permisos[9]='t';
+    
+    return permisos;
+}
+
 //En trozos[0] gardase o comando e a partir de trozos[1] os argumentos
 int TrocearCadena(char* cadena, char* trozos[]){
     int i=1;
@@ -51,11 +85,71 @@ void create(char *trozos[]){
     }
 }
 
-void getStats(){
+void getStats(char *nombre){
     struct stat stats;
 
-    if(lstat()){
+    if(lstat(nombre,&stats)==-1){
+        perror("stat error");
+    }
+    else{
+        printf("%9ld %s\n", stats.st_size, nombre);
+    }
+}
 
+void printTime(time_t t){
+    struct tm tm;
+
+    tm=*localtime(&t);
+
+    printf("%d/%d/%d-%d:%d", tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday,  tm.tm_hour, tm.tm_min);
+}
+
+void getStatsLargo(char *nombre, bool access, bool enlace){
+    struct stat stats;
+    struct passwd *usuario;
+    struct group *grupo;
+    char user[1024];
+    char group[1024];
+    char link[1024];
+
+    if(lstat(nombre,&stats)==-1){
+        perror("stat error");
+    }
+    else{
+        if(access){
+            printTime(stats.st_atime); //atime -> access time
+        }
+        else{
+            printTime(stats.st_mtime); //mtime -> modification time
+        }
+
+        usuario=getpwuid(stats.st_uid); //si podemos escribimos el nombre, sino el uid
+        if(usuario!=NULL){
+            strcpy(user,usuario->pw_name);
+        }
+        else{
+            sprintf(user,"%d",stats.st_uid);
+        }
+
+        grupo=getgrgid(stats.st_gid); //si podemos escribimos el nombre, sino el gid
+        if(grupo!=NULL){
+            strcpy(group,grupo->gr_name);
+        }
+        else{
+            sprintf(group, "%d", stats.st_gid);
+        }
+
+        printf("%5lu (%8lu) %8s %8s %s\t%ld %s", stats.st_nlink, stats.st_ino, user, group, ConvierteModo2(stats.st_mode), stats.st_size, nombre);
+
+        if(enlace && S_ISLNK(stats.st_mode)){
+            if(readlink(nombre,link,stats.st_size+1)<0){ //Aumentamos el tamaño en 1 porque readlink no añade el \0
+                perror("link error");
+            }
+            else{
+                printf(" -> %s",link);
+            }
+        }
+        printf("\n");
     }
 }
 
@@ -86,12 +180,16 @@ void stats(char *trozos[], int numWords){
     }
     else{
         //Aqui se pillan as stats de verdad
-        if(largo){
-            //Stats en formato largo
-        }
-        else{
-            //Stats en formato corto
-            getStats();
+        while(trozos[i]!=NULL){
+            if(largo){
+                //Stats en formato largo
+                getStatsLargo(trozos[i],access, enlace);
+            }
+            else{
+                //Stats en formato corto
+                getStats(trozos[i]);
+            }
+            i++;
         }
     }
 }

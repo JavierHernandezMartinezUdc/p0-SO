@@ -9,7 +9,13 @@
 #include <dirent.h>
 #include <stdbool.h>
 #include <sys/stat.h>
+#include <time.h>
+#include <pwd.h>
+#include <grp.h>
+#include <sys/types.h>
 
+char LetraTF (mode_t m);
+char *ConvierteModo2 (mode_t m);
 int TrocearCadena(char* cadena, char* trozos[]);
 
 void create(char *trozos[]);
