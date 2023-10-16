@@ -97,7 +97,47 @@ void stats(char *trozos[], int numWords){
 }
 
 
-void list();
+void list(char *trozos[]){
+    int subcommand,noncommand;
+    int x=1,l,i;
+    if(trozos[1]==NULL){
+        //
+    }
+    else if(trozos[1][0]!='-'){
+        //
+    }
+    else {
+        for(l=0; trozos[l][0]=='-'; l++){
+            noncommand = l+1;
+        }
+        while(x<noncommand) {
+            char *commandlist[6] = {"-hid", "-recb", "-reca", "-long", "-acc", "link"};
+            for (i = 0; i <= 6; i++) {
+                if (strcmp(trozos[x], commandlist[i]) == 0) {
+                    subcommand = i;
+                }
+            }
+            switch (subcommand) {
+                case 0:
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 3,4, 5:
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+}
+list [-reca] [-recb] [-hid][-long][-link][-acc] n1 n2 ..        lista contenidos de directorios
+-hid: incluye los ficheros ocultos
+-recb: recursivo (antes)
+-reca: recursivo (despues)
+resto parametros como stat
+
 
 
 void delete();
