@@ -111,7 +111,7 @@ void list(char *trozos[]){
             noncommand = l+1;
         }
         while(x<noncommand) {
-            char *commandlist[6] = {"-hid", "-recb", "-reca", "-long", "-acc", "link"};
+            char *commandlist[6] = {"-hid", "-recb", "-reca", "-long", "-acc", "-link"};
             for (i = 0; i <= 6; i++) {
                 if (strcmp(trozos[x], commandlist[i]) == 0) {
                     subcommand = i;
@@ -124,7 +124,7 @@ void list(char *trozos[]){
                     break;
                 case 2:
                     break;
-                case 3,4, 5:
+                case 3,4,5:
                     break;
                 default:
                     break;
@@ -132,11 +132,6 @@ void list(char *trozos[]){
         }
     }
 }
-list [-reca] [-recb] [-hid][-long][-link][-acc] n1 n2 ..        lista contenidos de directorios
--hid: incluye los ficheros ocultos
--recb: recursivo (antes)
--reca: recursivo (despues)
-resto parametros como stat
 
 
 
