@@ -101,10 +101,10 @@ void list(char *trozos[]){
     int subcommand,noncommand;
     int x=1,l,i;
     if(trozos[1]==NULL){
-        //
+        //directorio actual
     }
     else if(trozos[1][0]!='-'){
-        //
+        //lista nombre del directorio escrito y lo que tiene dentro y sus tamaños
     }
     else {
         for(l=0; trozos[l][0]=='-'; l++){
@@ -117,10 +117,14 @@ void list(char *trozos[]){
                     subcommand = i;
                 }
             }
+            //el archivo que se escribe tiene que estar dentro del directorio actual si es anterio da error
             switch (subcommand) {
                 case 0:
+                    //lista nombre directorio todo lo que tiene dentro y sus tamaños y todo lo que tienen dentro los archivos q tiene dentro
+                    //lo mismo pero en distinto orden
                     break;
                 case 1:
+                    //lista nombre directorio todo lo que tiene dentro y sus tamaños y todo lo que tienen dentro los archivos q tiene dentro
                     break;
                 case 2:
                     break;
