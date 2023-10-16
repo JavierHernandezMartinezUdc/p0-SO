@@ -10,11 +10,13 @@
 #include <stdbool.h>
 #include <sys/stat.h>
 
+int TrocearCadena(char* cadena, char* trozos[]);
+
 void create(char *trozos[]);
 //create ruta
 //create -f name crea un fichero
 //create name crea un directorio
-void stats(char *trozos[]);
+void stats(char *trozos[], int numWords);
 //stat -long listado largo
 //stat -acc acesstime
 //stat -link si es enlace simbolico, el path contenido

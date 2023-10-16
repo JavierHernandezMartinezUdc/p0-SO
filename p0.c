@@ -5,8 +5,8 @@
 #include "historic.h"
 #include "p1.h"
 
-void comandN(char *trozos[], tListH *H, bool *terminado, tListF *L);
-
+void comandN(char *cmd, char *trozos[], tListH *H, bool *terminado, tListF *L);
+/*
 //En trozos[0] gardase o comando e a partir de trozos[1] os argumentos
 int TrocearCadena(char* cadena, char* trozos[]){
     int i=1;
@@ -19,7 +19,7 @@ int TrocearCadena(char* cadena, char* trozos[]){
     }
     return i;
 }
-
+*/
 void imprimirPrompt(){
     printf("->");
 }
@@ -375,7 +375,7 @@ void salir(bool *terminado){
     *terminado=1;
 }
 
-void procesarComando(int comando, char *trozos[], bool *terminado, tListF *L, tListH *H){
+void procesarComando(char *cmd, int comando, char *trozos[], bool *terminado, tListF *L, tListH *H){
     switch(comando){
         case 0:
             authors(trozos);
@@ -396,7 +396,7 @@ void procesarComando(int comando, char *trozos[], bool *terminado, tListF *L, tL
             hist(H,trozos);
             break;
         case 6:
-            comandN(trozos,H,terminado,L);
+            comandN(cmd,trozos,H,terminado,L);
             break;
         case 7:
             Cmd_open(trozos, L);
@@ -429,7 +429,7 @@ void procesarComando(int comando, char *trozos[], bool *terminado, tListF *L, tL
             create(trozos);
             break;
         case 17:
-            //stat();
+            stats(trozos, TrocearCadena(cmd,trozos));
             break;
         case 18:
             //list();
@@ -513,7 +513,7 @@ int main(){
         TrocearCadena(comando, trozos);
         eleccionComando=elegirComando(trozos[0]);
         insertarComandoHist(&H, comandoCompleto);
-        procesarComando(eleccionComando, trozos, &terminado, &L, &H);
+        procesarComando(comando, eleccionComando, trozos, &terminado, &L, &H);
         }
     }
 
@@ -529,7 +529,7 @@ int main(){
     return 0;
 }
 
-void comandN(char *trozos[], tListH *H, bool *terminado, tListF *L){
+void comandN(char *cmd, char *trozos[], tListH *H, bool *terminado, tListF *L){
     tPosH p;
     int cnt=0;
 
@@ -557,7 +557,7 @@ void comandN(char *trozos[], tListH *H, bool *terminado, tListF *L){
         
             TrocearCadena(p.nombre,trozos);
             printf("Ejecutando el hist (%d): %s\n",i,trozos[0]);
-            procesarComando(elegirComando(trozos[0]),trozos,terminado, L, H);
+            procesarComando(cmd, elegirComando(trozos[0]),trozos,terminado, L, H);
         }
     }
 }
