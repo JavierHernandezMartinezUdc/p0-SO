@@ -193,8 +193,7 @@ void stats(char *trozos[], int numWords){
         }
     }
 }
-
-
+/*
 void list(char *trozos[]){
     DIR *dp;
     struct dirent *entry;
@@ -252,11 +251,18 @@ void list(char *trozos[]){
         }
     }
 }
+*/
+void delete(char **trozos){
+    int i=1;
+    char perrormsg[1024];
 
-
-
-void delete();
-
+    while(trozos[i]!=NULL){
+        if(remove(trozos[i])==-1){
+            sprintf(perrormsg, "Imposible borrar %s", trozos[i]);
+            perror(perrormsg);
+        }
+        i++;
+    }
+}
 
 void deltree();
-

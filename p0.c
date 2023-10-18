@@ -434,7 +434,7 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             //list();
             break;
         case 19:
-            //delete();
+            delete(trozos);
             break;
         case 20:
             //deltree();
