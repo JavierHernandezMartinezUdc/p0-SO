@@ -216,9 +216,9 @@ void list(char *trozos[]){
         //directorio actual
     }
     else if(trozos[1][0]!='-'){
-        dp =(opendir(stats()));
+        dp =(opendir("."));
         dir(dp);
-        closedir(stats());
+        closedir(dp);
     }
     else {
         for(l=0; trozos[l][0]=='-'; l++){
@@ -238,15 +238,18 @@ void list(char *trozos[]){
                     dp = opendir(trozos[noncommand]);
                     dir(dp);
                     entry = readdir(dp);
-                    while(entry!=NULL){
-                        dp=opendir(entry->d_name);
-                        dir(dp);
-                        entry=readdir(dp)
+                    while (entry!=NULL) {
+                        if (entry->d_type == DT_DIR) {
+                            dp = opendir(entry->d_name);
+                            dir(dp);
+                            entry = readdir(dp);
+                        } else if (entry->d_type == DT_REG) {
+                            printf("%s\n", entry->d_name);
+                        }
                     }
                     closedir(dp);
                     break;
                 case 1:
-                    //lista nombre directorio todo lo que tiene dentro y sus tamaños y todo lo que tienen dentro los archivos q tiene dentro
                     break;
                 case 2:
                     break;
