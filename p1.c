@@ -193,7 +193,19 @@ void stats(char *trozos[], int numWords){
         }
     }
 }
-/*
+
+void dir(DIR *dp){
+    struct dirent *entry;
+    if (dp == NULL) {
+    perror("Directorio vacío");
+    return;
+    }
+    printf("%s:\n", dirPath);
+    while ((entry = readdir(dp)) != NULL) {
+    printf("%s\n", entry->d_name);
+    }
+}
+
 void list(char *trozos[]){
     DIR *dp;
     struct dirent *entry;
@@ -204,20 +216,8 @@ void list(char *trozos[]){
         //directorio actual
     }
     else if(trozos[1][0]!='-'){
-        //lista nombre del directorio escrito y lo que tiene dentro y sus tamaños
-
-        dp = opendir(printRoute());  // Abre el directorio especificado
-        if (dp == NULL) {
-            perror("Error al abrir el directorio");
-            return;
-        }
-        //Lee lo que hay dentro
-        printf("%s:\n", dirPath);
-        while ((entry = readdir(dp)) != NULL) {
-            printf("%s\n", entry->d_name);
-        }
-
-        //Lo cierra
+        dp =(opendir("."));
+        dir(dp);
         closedir(dp);
     }
     else {
@@ -235,23 +235,41 @@ void list(char *trozos[]){
 
             switch (subcommand) {
                 case 0:
-                    //lista nombre directorio todo lo que tiene dentro y sus tamaños y todo lo que tienen dentro los archivos q tiene dentro
-                    //lo mismo pero en distinto orden
+                    dp = opendir(trozos[noncommand]);
+                    dir(dp);
+                    entry = readdir(dp);
+                    while (entry!=NULL) {
+                        if (entry->d_type == DT_DIR) {
+                            dp = opendir(entry->d_name);
+                            dir(dp);
+                            entry = readdir(dp);
+                        } else if (entry->d_type == DT_REG) {
+                            printf("%s\n", entry->d_name);
+                        }
+                    }
+                    closedir(dp);
                     break;
                 case 1:
-                    //lista nombre directorio todo lo que tiene dentro y sus tamaños y todo lo que tienen dentro los archivos q tiene dentro
                     break;
                 case 2:
                     break;
-                case 3,4,5:
+                case 3:
+                    list(strcat("list -long ",trozos[]-noncommand));
+                    break;
+                case 4:
+                    list(strcat("list -acc ",trozos[]-noncommand));
+                    break;
+                case 5:
+                    list(strcat("list -link ",trozos[]-noncommand));
                     break;
                 default:
+                    perror("Error al abrir el directorio");
                     break;
             }
         }
     }
 }
-*/
+
 void delete(char **trozos){
     int i=1;
     char perrormsg[1024];
