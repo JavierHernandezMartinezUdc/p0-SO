@@ -34,9 +34,9 @@ void stats(char *trozos[], int numWords);
 //stat ruta
 void list();
 
-void delete();
+void delete(char **trozos);
 
-void deltree();
+void deltree(char **trozos);
 
 
 #endif //P0_P1_H

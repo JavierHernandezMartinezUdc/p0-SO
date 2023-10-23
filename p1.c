@@ -265,61 +265,70 @@ void delete(char **trozos){
     }
 }
 
-void deltree(char **trozos){
+void delDir(char *path){
     DIR *dir;
     struct dirent *entry;
     char perrormsg[1024];
-    int i=1;
+    char nombre[1024];
     struct stat stats;
 
-    
+    dir=opendir(path);
 
+    if(dir!=NULL){
+        while((entry=readdir(dir))!=NULL){
+            if(strcmp(entry->d_name, ".")!=0 && strcmp(entry->d_name, "..")!=0){
+                sprintf(nombre, "%s/%s", path, entry->d_name);
+
+                if(lstat(nombre,&stats)==-1){
+                    perror("stat error");
+                    return;
+                }
+                else{
+                    if(S_ISDIR(stats.st_mode)){
+                        delDir(nombre);
+                    }
+                    else{
+                        if(remove(nombre)==-1){
+                            sprintf(perrormsg, "Imposible borrar %s", path);
+                            perror(perrormsg);
+                        }
+                    }
+                }
+            }
+        }
+        closedir(dir);
+    }
+
+    if(remove(path)==-1){
+        sprintf(perrormsg, "Imposible borrar %s", path);
+        perror(perrormsg);
+    }
+}
+
+void deltree(char **trozos){
+    struct stat stats;
+    int i=1;
+    char perrormsg[1024];
+
+    if(trozos[1]==NULL){
+        printRoute();
+    }
+    
     while(trozos[i]!=NULL){
-        if(lstat(trozos[i],stats)==-1){
+        if(lstat(trozos[i],&stats)==-1){
             perror("stat error");
         }
         else{
-            if(!S_ISDIR(stats.st_mode)){
+            if(S_ISDIR(stats.st_mode)){
+                delDir(trozos[i]);
+            }
+            else{
                 if(remove(trozos[i])==-1){
                     sprintf(perrormsg, "Imposible borrar %s", trozos[i]);
                     perror(perrormsg);
                 }
             }
-            else{
-                if(stats.st_size==0){
-                    if(remove(trozos[i])==-1){
-                        sprintf(perrormsg, "Imposible borrar %s", trozos[i]);
-                        perror(perrormsg);
-                    }
-                }
-                else{
-                    dir=opendir(trozos[i]);
-                    if(dir==NULL){
-                        sprintf(perrormsg, "Imposible borrar %s", trozos[i]);
-                        perror(perrormsg);
-                        return;
-                    }
-                }
-            }
         }
-
-        
-
-        dir = opendir(trozos[i]);
-        if(dir==NULL){
-            sprintf(perrormsg, "Imposible borrar %s", trozos[i]);
-            perror(perrormsg);
-            return;
-        }
-
-        entry = readdir(dir);
-        while(entry!=NULL){
-            
-        }
-
-        closedir(dir);
         i++;
     }
-
-    
 }

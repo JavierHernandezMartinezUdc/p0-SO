@@ -437,7 +437,7 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             delete(trozos);
             break;
         case 20:
-            //deltree();
+            deltree(trozos);
             break;
         default:
             printf("No ejecutado: No such file or directory\n");
