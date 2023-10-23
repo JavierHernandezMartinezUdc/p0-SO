@@ -287,31 +287,34 @@ void delDir(char *path){
     DIR *dir;
     struct dirent *entry;
     char perrormsg[1024];
-    char nombre[1024];
     struct stat stats;
+    char ruta[1024];
 
     dir=opendir(path);
 
     if(dir!=NULL){
         while((entry=readdir(dir))!=NULL){
             if(strcmp(entry->d_name, ".")!=0 && strcmp(entry->d_name, "..")!=0){
-                sprintf(nombre, "%s/%s", path, entry->d_name);
 
-                if(lstat(nombre,&stats)==-1){
+                getcwd(ruta,1024);
+                chdir(path);
+
+                if(lstat(entry->d_name,&stats)==-1){
                     perror("stat error");
                     return;
                 }
                 else{
                     if(S_ISDIR(stats.st_mode)){
-                        delDir(nombre);
+                        delDir(entry->d_name);
                     }
                     else{
-                        if(remove(nombre)==-1){
+                        if(remove(entry->d_name)==-1){
                             sprintf(perrormsg, "Imposible borrar %s", path);
                             perror(perrormsg);
                         }
                     }
                 }
+                chdir(ruta);
             }
         }
         closedir(dir);
