@@ -13,16 +13,12 @@
 #include <pwd.h>
 #include <grp.h>
 #include <sys/types.h>
+#include <libgen.h>
 
 
 char LetraTF (mode_t m);
 char *ConvierteModo2 (mode_t m);
 int TrocearCadena(char* cadena, char* trozos[]);
-
-//list
-#include <dirent.h>
-#include <libgen.h>
-
 void create(char *trozos[]);
 //create ruta
 //create -f name crea un fichero
