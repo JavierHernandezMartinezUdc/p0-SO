@@ -13,6 +13,7 @@
 #include <pwd.h>
 #include <grp.h>
 #include <sys/types.h>
+#include <dirent.h>
 
 char LetraTF (mode_t m);
 char *ConvierteModo2 (mode_t m);

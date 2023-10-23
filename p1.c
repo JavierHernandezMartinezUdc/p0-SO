@@ -265,4 +265,61 @@ void delete(char **trozos){
     }
 }
 
-void deltree();
+void deltree(char **trozos){
+    DIR *dir;
+    struct dirent *entry;
+    char perrormsg[1024];
+    int i=1;
+    struct stat stats;
+
+    
+
+    while(trozos[i]!=NULL){
+        if(lstat(trozos[i],stats)==-1){
+            perror("stat error");
+        }
+        else{
+            if(!S_ISDIR(stats.st_mode)){
+                if(remove(trozos[i])==-1){
+                    sprintf(perrormsg, "Imposible borrar %s", trozos[i]);
+                    perror(perrormsg);
+                }
+            }
+            else{
+                if(stats.st_size==0){
+                    if(remove(trozos[i])==-1){
+                        sprintf(perrormsg, "Imposible borrar %s", trozos[i]);
+                        perror(perrormsg);
+                    }
+                }
+                else{
+                    dir=opendir(trozos[i]);
+                    if(dir==NULL){
+                        sprintf(perrormsg, "Imposible borrar %s", trozos[i]);
+                        perror(perrormsg);
+                        return;
+                    }
+                }
+            }
+        }
+
+        
+
+        dir = opendir(trozos[i]);
+        if(dir==NULL){
+            sprintf(perrormsg, "Imposible borrar %s", trozos[i]);
+            perror(perrormsg);
+            return;
+        }
+
+        entry = readdir(dir);
+        while(entry!=NULL){
+            
+        }
+
+        closedir(dir);
+        i++;
+    }
+
+    
+}
