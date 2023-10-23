@@ -193,7 +193,7 @@ void stats(char *trozos[], int numWords){
         }
     }
 }
-
+/*
 void dir(DIR *dp){
     struct dirent *entry;
     if (dp == NULL) {
@@ -269,7 +269,7 @@ void list(char *trozos[]){
         }
     }
 }
-
+*/
 void delete(char **trozos){
     int i=1;
     char perrormsg[1024];
