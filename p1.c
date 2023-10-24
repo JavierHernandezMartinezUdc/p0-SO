@@ -216,7 +216,7 @@ void getShortDir(char *path) {
     closedir(dir);
 }
 
-void getLongDir(char *path, char *trozos[], int op, bool hid) {
+void getLongDir(char *path, char *trozos[], int op, bool hid, int x) {
     DIR *dir;
     struct dirent *entry;
     struct stat stats;
@@ -230,7 +230,7 @@ void getLongDir(char *path, char *trozos[], int op, bool hid) {
     }
 
     printf("%s:\n", path);
-    strcpy(trozos[5], path);
+    strcpy(trozos[x], path);
 
     while ((entry = readdir(dir)) != NULL) {
         if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
@@ -298,7 +298,7 @@ void list(char *trozos[]){
               op = 2;
           }
         }
-        getLongDir(trozos[directori], subcommand, op, hid);
+        getLongDir(trozos[directori], subcommand, op, hid,x);
     }
 }
 
