@@ -193,7 +193,7 @@ void stats(char *trozos[], int numWords){
         }
     }
 }
-
+/*
 void getShortDir(char *path) {
     DIR *dir;
     struct dirent *entry;
@@ -238,7 +238,7 @@ void getLongDir(char *path, char *trozos[], int op, bool hid, int x) {
 
             if (stat(ruta, &stats) == 0) {
                 if (S_ISDIR(stats.st_mode)) {
-                    getLongDir(ruta, trozos, op, hid);
+                    getLongDir(ruta, trozos, op, hid, x);
                 } else if (S_ISREG(stats.st_mode)) {
                     printf("%s\n", entry->d_name);
                 }
@@ -299,6 +299,166 @@ void list(char *trozos[]){
           }
         }
         getLongDir(trozos[directori], subcommand, op, hid,x);
+    }
+}
+*/
+
+void listDir(char *path, bool largo, bool access, bool enlace, bool reca, bool recb, bool hid){
+    DIR *dir;
+    struct dirent *entry;
+    char ruta[1024];
+    char perrormsg[1024];
+    struct stat sts;
+    char **subdirs=NULL;
+    char **files=NULL;
+    int sizeD=0, sizeF=0;
+    char nombre[1024];
+
+    dir=opendir(path);
+
+    if(dir!=NULL){
+
+        getcwd(ruta,1024);
+        chdir(path);
+
+        while((entry=readdir(dir))!=NULL){
+            if(strcmp(entry->d_name, ".")!=0 && strcmp(entry->d_name, "..")!=0){
+                if(lstat(entry->d_name,&sts)==-1){
+                    perror("stat error");
+                    return;
+                }
+
+                if(reca || recb){
+                    if(S_ISDIR(sts.st_mode)){
+                        sizeD++;
+                        subdirs=(char **)realloc(subdirs,sizeD*sizeof(char*));
+                        //sprintf(nombre,"%s/%s",path,entry->d_name);
+                        //subdirs[sizeD-1]=strdup(nombre);
+                        subdirs[sizeD-1]=strdup(entry->d_name);
+                    }
+                    else{
+                        sizeF++;
+                        files=(char **)realloc(files,sizeF*sizeof(char*));
+                        files[sizeF-1]=strdup(entry->d_name);
+                    }
+                }
+                else{
+                    if(largo){
+                        getStatsLargo(entry->d_name,access,enlace);
+                    }
+                    else{
+                        getStats(entry->d_name);
+                    }
+                }
+            }
+        }
+
+        if(reca){
+            //padre hijo
+            for(int i=0;i<sizeF;i++){
+                if(largo){
+                    getStatsLargo(files[i],access,enlace);
+                }
+                else{
+                    getStats(files[i]);
+                }
+            }
+            for(int i=0;i<sizeD;i++){
+                printf("************%s\n",subdirs[i]);
+                listDir(subdirs[i],largo,access,enlace,reca,recb,hid);
+            }
+        }
+        else if(recb){
+            //hijo padre
+            for(int i=0;i<sizeD;i++){
+                printf("************%s\n",subdirs[i]);
+                listDir(subdirs[i],largo,access,enlace,reca,recb,hid);
+            }
+            for(int i=0;i<sizeF;i++){
+                if(largo){
+                    getStatsLargo(files[i],access,enlace);
+                }
+                else{
+                    getStats(files[i]);
+                }
+            }
+        }
+
+
+
+
+
+        chdir(ruta);
+
+
+
+    }
+    else{
+        sprintf(perrormsg,"Imposible abrir %s",path);
+        perror(perrormsg);
+    }
+}
+
+void list(char **trozos, int numWords){
+    bool largo=false, access=false, enlace=false, reca=false, recb=false, hid=false;
+    int i=0;
+    struct stat sts;
+    char perrormsg[1024];
+
+    for(i=1;i<numWords;i++){
+        if(strcmp(trozos[i],"-long")==0){
+            largo=true;
+        }
+        else if(strcmp(trozos[i],"-acc")==0){
+            access=true;
+        }
+        else if(strcmp(trozos[i],"-link")==0){
+            enlace=true;
+        }
+        else if(strcmp(trozos[i],"-reca")==0){
+            reca=true;
+        }
+        else if(strcmp(trozos[i],"-recb")==0){
+            recb=true;
+        }
+        else if(strcmp(trozos[i],"-hid")==0){
+            hid=true;
+        }
+        else{
+            break;
+        }
+    }
+
+    //i indica aqui el numero de palabras antes de los ficheros, por lo que si i=4 significa que trozos[4] (i) es el primer fichero
+    //En caso de que no haya nombre de fichero entonces imprime la ruta 
+
+    if(trozos[i]==NULL){
+        printRoute();
+    }
+    else{
+        while(trozos[i]!=NULL){
+            if(lstat(trozos[i],&sts)==-1){
+                sprintf(perrormsg,"error al acceder a %s",trozos[i]);
+                perror(perrormsg);
+            }
+            else{
+                if(S_ISDIR(sts.st_mode)){
+                    //Directorio
+                    printf("************%s\n",trozos[i]);
+                    listDir(trozos[i],largo,access,enlace,reca,recb,hid);
+                }
+                else{
+                    //Archivo
+                    if(largo){
+                        getStatsLargo(trozos[i],access,enlace);
+                    }
+                    else{
+                        getStats(trozos[i]);
+                    }
+                }
+            }
+            i++;
+        }
     }
 }
 
