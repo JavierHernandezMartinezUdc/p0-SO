@@ -231,7 +231,6 @@ void getLongDir(char *path, char *trozos[], int op, bool hid) {
 
     printf("%s:\n", path);
     strcpy(trozos[5], path);
-    stats(trozos,);
 
     while ((entry = readdir(dir)) != NULL) {
         if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
