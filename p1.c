@@ -10,7 +10,7 @@ char LetraTF (mode_t m){
         case __S_IFCHR: return 'c'; /*char device*/
         case __S_IFIFO: return 'p'; /*pipe*/
         default: return '?'; /*desconocido, no deberia aparecer*/
-     }
+    }
 }
 
 char *ConvierteModo2 (mode_t m){
@@ -142,7 +142,7 @@ void getStatsLargo(char *nombre, bool access, bool enlace){
         printf("%5lu (%8lu) %8s %8s %s\t%ld %s", stats.st_nlink, stats.st_ino, user, group, ConvierteModo2(stats.st_mode), stats.st_size, nombre);
 
         if(enlace && S_ISLNK(stats.st_mode)){
-            if(readlink(nombre,link,stats.st_size+1)<0){ //Aumentamos el tamaño en 1 porque readlink no añade el \0
+            if(readlink(nombre,link,1024)<0){
                 perror("link error");
             }
             else{
@@ -296,8 +296,8 @@ void delDir(char *path){
         while((entry=readdir(dir))!=NULL){
             if(strcmp(entry->d_name, ".")!=0 && strcmp(entry->d_name, "..")!=0){
 
-                getcwd(ruta,1024);
-                chdir(path);
+                getcwd(ruta,1024); //Gardo a ruta actual
+                chdir(path); //Entro no directorio que vou eliminar
 
                 if(lstat(entry->d_name,&stats)==-1){
                     perror("stat error");
@@ -314,7 +314,7 @@ void delDir(char *path){
                         }
                     }
                 }
-                chdir(ruta);
+                chdir(ruta); //Volvo o directorio pai
             }
         }
         closedir(dir);
