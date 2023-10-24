@@ -223,28 +223,28 @@ void getLongDir(char *path, char *trozos[], int op, bool hid, int x) {
     char ruta[1024];
 
     dir = opendir(path);
+    strcpy(trozos[x], path);
 
     if (dir == NULL) {
         perror("Error al abrir el directorio");
         return;
     }
 
-    printf("%s:\n", path);
-    strcpy(trozos[x], path);
-
     while ((entry = readdir(dir)) != NULL) {
         if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
-            if(op==1){printf("%s\n", entry->d_name);;}
+            sprintf(ruta,"%s\n", entry->d_name);;
+
+            if(op==1){printf("%s:\n", path);stats(trozos,5);}
 
             if (stat(ruta, &stats) == 0) {
                 if (S_ISDIR(stats.st_mode)) {
-                    getLongDir(ruta, trozos, op, hid);
+                    getLongDir(ruta, trozos, op, hid, x);
                 } else if (S_ISREG(stats.st_mode)) {
                     printf("%s\n", entry->d_name);
                 }
             }
 
-            if(op==2){printf("%s\n", entry->d_name);;}
+            if(op==2){printf("%s:\n", path);stats(trozos,5);}
         }
     }
 
@@ -257,6 +257,7 @@ void list(char *trozos[]){
     int directori, op;
     bool hid=false;
     int x=1,i,y=1;
+
     if(trozos[1]==NULL){
         printRoute();
         //directorio actual
@@ -269,6 +270,7 @@ void list(char *trozos[]){
         for(i=0; trozos[i][0]=='-'; i++){
             directori = i+1;
         }
+
         for (i=1; i<directori;i++){
             if(strcmp(trozos[i],"-long")==0)
             {
@@ -298,7 +300,7 @@ void list(char *trozos[]){
               op = 2;
           }
         }
-        getLongDir(trozos[directori], subcommand, op, hid,x);
+        getLongDir(trozos[directori], subcommand, op, hid, x);
     }
 }
 
