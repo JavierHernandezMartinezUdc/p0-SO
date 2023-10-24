@@ -322,14 +322,13 @@ void listDir(char *path, bool largo, bool access, bool enlace, bool reca, bool r
         chdir(path);
 
         while((entry=readdir(dir))!=NULL){
-            if(strcmp(entry->d_name, ".")!=0 && strcmp(entry->d_name, "..")!=0){
+            if(hid || entry->d_name[0]!='.'){
                 if(lstat(entry->d_name,&sts)==-1){
                     perror("stat error");
                     return;
                 }
-
                 if(reca || recb){
-                    if(S_ISDIR(sts.st_mode)){
+                    if(S_ISDIR(sts.st_mode) && strcmp(entry->d_name, ".")!=0 && strcmp(entry->d_name, "..")!=0){
                         sizeD++;
                         subdirs=(char **)realloc(subdirs,sizeD*sizeof(char*));
                         //sprintf(nombre,"%s/%s",path,entry->d_name);
