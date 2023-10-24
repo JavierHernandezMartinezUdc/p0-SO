@@ -271,17 +271,17 @@ void list(char *trozos[]){
             directori = i+1;
         }
         for (i=1; i<directori;i++){
-            if(strcmp(trozos[i]),"-long")==0)
+            if(strcmp(trozos[i],"-long")==0)
             {
                 strcpy(subcommand[x],"-long");
                 x++;
             }
-            else if(strcmp(trozos[i]),"-acc")==0)
+            else if(strcmp(trozos[i],"-acc")==0)
             {
                 strcpy(subcommand[x],"-acc");
                 x++;
             }
-            else if(strcmp(trozos[i]),"-link")==0)
+            else if(strcmp(trozos[i],"-link")==0)
             {
                 strcpy(subcommand[x],"-link");
                 x++;
