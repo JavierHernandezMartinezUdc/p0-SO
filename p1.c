@@ -230,6 +230,8 @@ void getLongDir(char *path, char *trozos[], int op, bool hid, int x) {
         return;
     }
 
+    //TODO -hid
+
     while ((entry = readdir(dir)) != NULL) {
         if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
             sprintf(ruta,"%s\n", entry->d_name);;
