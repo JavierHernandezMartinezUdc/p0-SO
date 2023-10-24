@@ -331,9 +331,9 @@ void listDir(char *path, bool largo, bool access, bool enlace, bool reca, bool r
                     if(S_ISDIR(sts.st_mode) && strcmp(entry->d_name, ".")!=0 && strcmp(entry->d_name, "..")!=0){
                         sizeD++;
                         subdirs=(char **)realloc(subdirs,sizeD*sizeof(char*));
-                        //sprintf(nombre,"%s/%s",path,entry->d_name);
-                        //subdirs[sizeD-1]=strdup(nombre);
-                        subdirs[sizeD-1]=strdup(entry->d_name);
+                        sprintf(nombre,"%s/%s",path,entry->d_name);
+                        subdirs[sizeD-1]=strdup(nombre);
+                        //subdirs[sizeD-1]=strdup(entry->d_name);
                     }
                     else{
                         sizeF++;
@@ -364,15 +364,34 @@ void listDir(char *path, bool largo, bool access, bool enlace, bool reca, bool r
             }
             for(int i=0;i<sizeD;i++){
                 printf("************%s\n",subdirs[i]);
-                listDir(subdirs[i],largo,access,enlace,reca,recb,hid);
+                
+                char *util=strrchr(subdirs[i],'/');
+                if(util!=NULL){
+                    util++;
+                }
+                else{
+                    util=subdirs[i];
+                }
+
+                listDir(util,largo,access,enlace,reca,recb,hid);
             }
         }
         else if(recb){
             //hijo padre
             for(int i=0;i<sizeD;i++){
-                printf("************%s\n",subdirs[i]);
-                listDir(subdirs[i],largo,access,enlace,reca,recb,hid);
+                //printf("************%s\n",subdirs[i]);
+                
+                char *util=strrchr(subdirs[i],'/');
+                if(util!=NULL){
+                    util++;
+                }
+                else{
+                    util=subdirs[i];
+                }
+
+                listDir(util,largo,access,enlace,reca,recb,hid);
             }
+            printf("************%s\n",path);
             for(int i=0;i<sizeF;i++){
                 if(largo){
                     getStatsLargo(files[i],access,enlace);
@@ -383,14 +402,18 @@ void listDir(char *path, bool largo, bool access, bool enlace, bool reca, bool r
             }
         }
 
+        for(int i=0;i<sizeD;i++){
+            free(subdirs[i]);
+        }
+        for(int i=0;i<sizeF;i++){
+            free(files[i]);
+        }
 
-
-
+        free(files);
+        free(subdirs);
 
         chdir(ruta);
-
-
-
+        closedir(dir);
     }
     else{
         sprintf(perrormsg,"Imposible abrir %s",path);
@@ -443,7 +466,9 @@ void list(char **trozos, int numWords){
             else{
                 if(S_ISDIR(sts.st_mode)){
                     //Directorio
-                    printf("************%s\n",trozos[i]);
+                    if(reca){
+                        printf("************%s\n",trozos[i]);
+                    }
                     listDir(trozos[i],largo,access,enlace,reca,recb,hid);
                 }
                 else{
