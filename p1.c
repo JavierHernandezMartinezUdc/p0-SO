@@ -235,7 +235,7 @@ void getLongDir(char *path, char *trozos[], int op, bool hid) {
 
     while ((entry = readdir(dir)) != NULL) {
         if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
-            if(op==1){snprintf(ruta, sizeof(ruta), "%s/%s", path, entry->d_name);}
+            if(op==1){printf("%s\n", entry->d_name);;}
 
             if (stat(ruta, &stats) == 0) {
                 if (S_ISDIR(stats.st_mode)) {
@@ -244,7 +244,8 @@ void getLongDir(char *path, char *trozos[], int op, bool hid) {
                     printf("%s\n", entry->d_name);
                 }
             }
-            if(op==2){snprintf(ruta, sizeof(ruta), "%s/%s", path, entry->d_name);}
+
+            if(op==2){printf("%s\n", entry->d_name);;}
         }
     }
 
