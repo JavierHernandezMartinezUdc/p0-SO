@@ -193,83 +193,115 @@ void stats(char *trozos[], int numWords){
         }
     }
 }
-/*
-void dir(DIR *dp){
+
+void getShortDir(char *path) {
+    DIR *dir;
     struct dirent *entry;
-    if (dp == NULL) {
-    perror("Directorio vacío");
-    return;
+
+    dir = opendir(path);
+
+    if (dir == NULL) {
+        perror("Error al abrir el directorio");
+        return;
     }
-    printf("%s:\n", dirPath);
-    while ((entry = readdir(dp)) != NULL) {
-    printf("%s\n", entry->d_name);
+
+    printf("%s:\n", path);
+
+    while ((entry = readdir(dir)) != NULL) {
+        if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
+            printf("%s\n", entry->d_name);
+        }
     }
+
+    closedir(dir);
+}
+
+void getLongDir(char *path, char *trozos[], int op, bool hid) {
+    DIR *dir;
+    struct dirent *entry;
+    struct stat stats;
+    char ruta[1024];
+
+    dir = opendir(path);
+
+    if (dir == NULL) {
+        perror("Error al abrir el directorio");
+        return;
+    }
+
+    printf("%s:\n", path);
+    strcpy(trozos[5], path);
+    stats(trozos,);
+
+    while ((entry = readdir(dir)) != NULL) {
+        if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
+            if(op==1){snprintf(ruta, sizeof(ruta), "%s/%s", path, entry->d_name);}
+
+            if (stat(ruta, &stats) == 0) {
+                if (S_ISDIR(stats.st_mode)) {
+                    getLongDir(ruta, trozos, op, hid);
+                } else if (S_ISREG(stats.st_mode)) {
+                    printf("%s\n", entry->d_name);
+                }
+            }
+            if(op==2){snprintf(ruta, sizeof(ruta), "%s/%s", path, entry->d_name);}
+        }
+    }
+
+    closedir(dir);
 }
 
 void list(char *trozos[]){
-    DIR *dp;
-    struct dirent *entry;
-    int subcommand,noncommand;
-    int x=1,l,i;
+    char *subcommand[5];
+    strcpy(subcommand[0],"stats");
+    int directori, op;
+    bool hid=false;
+    int x=1,i,y=1;
     if(trozos[1]==NULL){
         printRoute();
         //directorio actual
     }
     else if(trozos[1][0]!='-'){
-        dp =(opendir("."));
-        dir(dp);
-        closedir(dp);
+        getShortDir(trozos[1]);
+        //listar directorio
     }
     else {
-        for(l=0; trozos[l][0]=='-'; l++){
-            noncommand = l+1;
+        for(i=0; trozos[i][0]=='-'; i++){
+            directori = i+1;
         }
-        while(x<noncommand) {
-            char *commandlist[6] = {"-hid", "-recb", "-reca", "-long", "-acc", "-link"};
-            for (i = 0; i <= 6; i++) {
-                if (strcmp(trozos[x], commandlist[i]) == 0) {
-                    subcommand = i;
-                }
+        for (i=1; i<directori;i++){
+            if(strcmp(trozos[i]),"-long")==0)
+            {
+                strcpy(subcommand[x],"-long");
+                x++;
             }
-            //el archivo que se escribe tiene que estar dentro del directorio actual si es anterio da error
+            else if(strcmp(trozos[i]),"-acc")==0)
+            {
+                strcpy(subcommand[x],"-acc");
+                x++;
+            }
+            else if(strcmp(trozos[i]),"-link")==0)
+            {
+                strcpy(subcommand[x],"-link");
+                x++;
+            }
+        }
 
-            switch (subcommand) {
-                case 0:
-                    dp = opendir(trozos[noncommand]);
-                    dir(dp);
-                    entry = readdir(dp);
-                    while (entry!=NULL) {
-                        if (entry->d_type == DT_DIR) {
-                            dp = opendir(entry->d_name);
-                            dir(dp);
-                            entry = readdir(dp);
-                        } else if (entry->d_type == DT_REG) {
-                            printf("%s\n", entry->d_name);
-                        }
-                    }
-                    closedir(dp);
-                    break;
-                case 1:
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    list(strcat("list -long ",trozos[]-noncommand));
-                    break;
-                case 4:
-                    list(strcat("list -acc ",trozos[]-noncommand));
-                    break;
-                case 5:
-                    list(strcat("list -link ",trozos[]-noncommand));
-                    break;
-                default:
-                    perror("Error al abrir el directorio");
-                    break;
-            }
+        for (i = 1; i <= directori; i++) {
+          if (strcmp(trozos[i], "-hid") == 0) {
+              hid =true;
+          }
+          if ((strcmp(trozos[i], "-recb") == 0) && op!=2) {
+              op = 1;
+          }
+          if (strcmp(trozos[i], "-reca")== 0 && op!=1){
+              op = 2;
+          }
         }
+        getLongDir(trozos[directori], subcommand, op, hid);
     }
 }
-*/
+
 void delete(char **trozos){
     int i=1;
     char perrormsg[1024];

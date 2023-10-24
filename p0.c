@@ -431,7 +431,7 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             stats(trozos, numWords);
             break;
         case 18:
-            //list();
+            list();
             break;
         case 19:
             delete(trozos);
