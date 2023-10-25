@@ -29,10 +29,6 @@ void stats(char *trozos[], int numWords);
 //stat -link si es enlace simbolico, el path contenido
 //stat ruta
 void list();
-
 void delete(char **trozos);
-
 void deltree(char **trozos);
-
-
 #endif //P0_P1_H
