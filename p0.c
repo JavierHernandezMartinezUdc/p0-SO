@@ -1,3 +1,10 @@
+/*
+Javier Hernandez Martinez
+javier.hernandez.martinez@udc.es
+
+Paula Carril Gontan
+paula.carril@udc.es
+*/
 #include <math.h>
 #include <sys/utsname.h> //Utilizase en infosys
 #include "shellopenfiles.h"
