@@ -218,7 +218,7 @@ void listDir(char *path, bool largo, bool access, bool enlace, bool reca, bool r
     if(dir!=NULL){
 
         getcwd(ruta,1024);
-        chdir(path);
+        chdir(util);
 
         while((entry=readdir(dir))!=NULL){
 
@@ -232,7 +232,23 @@ void listDir(char *path, bool largo, bool access, bool enlace, bool reca, bool r
 
             if(hid || util[0]!='.'){
                 if(lstat(util,&sts)==-1){
-                    perror("stat error");
+                    printf("%s\n",path);
+                    //printf("%s\n",entry->d_name);
+                    printf("%s\n",util);
+                    perror("stat list error");
+
+                    for(int i=0;i<sizeD;i++){
+                        free(subdirs[i]);
+                    }
+                    for(int i=0;i<sizeF;i++){
+                        free(files[i]);
+                    }
+
+                    free(files);
+                    free(subdirs);
+
+                    closedir(dir);
+
                     return;
                 }
                 if(reca || recb){
