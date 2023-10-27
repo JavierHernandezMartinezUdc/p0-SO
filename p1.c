@@ -206,7 +206,7 @@ void listDir(char *path, bool largo, bool access, bool enlace, bool reca, bool r
     char nombre[4096];
 
     char* util=strrchr(path,'/');
-    if(util!=NULL){
+    if(util!=NULL && path[0]!='/'){
         util++;
     }
     else{
