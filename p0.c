@@ -67,7 +67,7 @@ void pid(char *trozos[]){
     if(trozos[1]==NULL){
         printf("PID: %d\n",getpid());
     }
-    else{
+    else if(strcmp(trozos[1],"-p")==0){
         printf("PPID: %d\n",getppid());
     }
 }
@@ -117,13 +117,17 @@ void hora(){
 }
 
 void printListH(tListH L){
-    for (tPosH i = firstH(L); i != NULL; i = nextH(i, L)) {
-            tItemH comando = getItemH(i, L);
+    tPosH i;
+    tItemH comando;
+    for (i = firstH(L); i != NULL; i = nextH(i, L)) {
+            comando = getItemH(i, L);
             printf("%d->%s\n", comando.id, comando.nombre);
         }
 }
 
 void hist(tListH *historial, char *trozos[]) {
+    tPosH i, x;
+    tItemH comando;
     if (trozos[1] == NULL || trozos[1][0]!='-') {
         //Muestra el historial
         printListH(*historial);
@@ -134,9 +138,9 @@ void hist(tListH *historial, char *trozos[]) {
         char N[strlen(trozos[1])-1];
         int n = atoi(strcpy(N, trozos[1]+1));
         if(n >= 0 && n <= getItemH(lastH(*historial),*historial).id){
-            tPosH  x = findItemH(n, *historial);
-            for (tPosH i = firstH(*historial); i != x; i = nextH(i, *historial)) {
-                tItemH comando = getItemH(i, *historial);
+            x = findItemH(n, *historial);
+            for (i = firstH(*historial); i != x; i = nextH(i, *historial)) {
+                comando = getItemH(i, *historial);
                 printf("%d->%s\n", comando.id, comando.nombre);
             }
         }
@@ -297,8 +301,9 @@ void infosys(){
 }
 
 void help(char *trozos[]) {
-    //Faltan las descripciones xd xd
+    //Comandos y sus descripciones
     if (trozos[1] == NULL) {
+        //Si se llama a la funcion sin argumentos muestra una lista de todos los comandos
         printf("help [cmd] ayuda sobre comandos\nComandos disponibles:\n");
         printf("authors [-l|-n]\n");
         printf("pid [-p]\n");
@@ -322,6 +327,7 @@ void help(char *trozos[]) {
         printf("delete\n");
         printf("deltree\n");
     } else {
+        //Si se llama con un argumento muestra una breve descripcion del comando
         if (strcmp(trozos[1], "authors") == 0) {
             printf("authors: muestra los nombres y los inicios de sesión de los autores del programa\n");
             printf("authors -l: muesta solo los inicios de sesión\n");
@@ -536,15 +542,17 @@ int main(){
 }
 
 void comandN(int numWords, char *trozos[], tListH *H, bool *terminado, tListF *L){
-    tPosH p;
-    int cnt=0;
+    tPosH i;
+    tItemH p;
+    tPosH q;
+    int cnt=0, x;
 
     if(trozos[1]==NULL){
         printListH(*H);
     }
     else{
         if(strcmp(trozos[1],"0")==0){
-            for(p=firstH(*H);p!=NULL;p=nextH(p,*H)){
+            for(i=firstH(*H);i!=NULL;i=nextH(i,*H)){
             cnt++;
             }
             if(cnt==1){
@@ -552,17 +560,17 @@ void comandN(int numWords, char *trozos[], tListH *H, bool *terminado, tListF *L
                 return;
             }
         }
-        int i=atoi(trozos[1]);
-        tPosH q=findItemH(i,*H);
+        x=atoi(trozos[1]);
+        q=findItemH(x,*H);
 
         if(q==NULL){
-            printf("No hay elemento %i en el historico\n",i);
+            printf("No hay elemento %i en el historico\n",x);
         }
         else{
-            tItemH p=getItemH(q,*H);
+            p=getItemH(q,*H);
         
             TrocearCadena(p.nombre,trozos);
-            printf("Ejecutando el hist (%d): %s\n",i,trozos[0]);
+            printf("Ejecutando el hist (%d): %s\n",x,trozos[0]);
             procesarComando(numWords, elegirComando(trozos[0]),trozos,terminado, L, H);
         }
     }

@@ -85,6 +85,14 @@ void create(char *trozos[]){
     }
 }
 
+void printTime(time_t t){
+    struct tm tm;
+
+    tm=*localtime(&t);
+
+    printf("%d/%d/%d-%d:%d", tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday,  tm.tm_hour, tm.tm_min);
+}
+
 void getStats(char *nombre){
     struct stat stats;
 
@@ -94,14 +102,6 @@ void getStats(char *nombre){
     else{
         printf("%9ld %s\n", stats.st_size, nombre);
     }
-}
-
-void printTime(time_t t){
-    struct tm tm;
-
-    tm=*localtime(&t);
-
-    printf("%d/%d/%d-%d:%d", tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday,  tm.tm_hour, tm.tm_min);
 }
 
 void getStatsLargo(char *nombre, bool access, bool enlace){
