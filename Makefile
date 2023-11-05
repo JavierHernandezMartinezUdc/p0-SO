@@ -12,8 +12,11 @@ listaF.o:
 listaH.o:
 	gcc -c historic.c
 
-compilar: p0.o p1.o listaF.o listaH.o
-	gcc -Wall -o p0 p0.o p1.o shellopenfiles.o historic.o
+listaM.o:
+	gcc -c mem.c
+
+compilar: p0.o p1.o listaF.o listaH.o listaM.o
+	gcc -Wall -o p0 p0.o p1.o shellopenfiles.o historic.o mem.o
 	rm -f *.o
 
 ejecutar:
