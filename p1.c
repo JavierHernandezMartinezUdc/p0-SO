@@ -394,7 +394,7 @@ void list(char **trozos, int numWords){
     }
 }
 
-void delete(char **trozos){
+void deleteEmpty(char **trozos){
     int i=1;
     char perrormsg[1024];
 

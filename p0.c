@@ -5,8 +5,13 @@ javier.hernandez.martinez@udc.es
 Paula Carril Gontan
 paula.carril@udc.es
 */
+
+/*
 #include <math.h>
 #include <sys/utsname.h> //Utilizase en infosys
+*/
+
+#include "librerias.h"
 #include "shellopenfiles.h"
 #include "historic.h"
 #include "p1.h"
@@ -447,7 +452,7 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             list(trozos,numWords);
             break;
         case 19:
-            delete(trozos);
+            deleteEmpty(trozos);
             break;
         case 20:
             deltree(trozos);
