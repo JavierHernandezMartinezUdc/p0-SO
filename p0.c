@@ -393,6 +393,14 @@ void salir(bool *terminado){
     *terminado=1;
 }
 
+/*
+bool isNumber(char *string){
+    char *endptr;
+    int number=strtol(string,&endptr,10);
+    return *endptr=='\0';
+}
+*/
+
 void procesarComando(int numWords, int comando, char *trozos[], bool *terminado, tListF *L, tListH *H, tListM *M){
     switch(comando){
         case 0:
@@ -459,7 +467,7 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             deltree(trozos);
             break;
         case 21:
-            //malloc
+            mallocCmd(trozos,M);
             break;
         case 22:
             //shared
@@ -477,13 +485,13 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             //memdump
             break;
         case 27:
-            //memfill
+            //memefill
             break;
         case 28:
             //mem
             break;
         case 29:
-            //recurse
+            Recursiva(atoi(trozos[1]));
             break;            
         default:
             printf("No ejecutado: No such file or directory\n");

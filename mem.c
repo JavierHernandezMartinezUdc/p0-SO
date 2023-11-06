@@ -22,6 +22,17 @@ tItemM getItemM(tPosM pos, tListM L){
     return pos->data;
 }
 
+tPosM findItemM(size_t tam, tAllocType allocType, tListM L) {
+    tPosM p;
+    if(allocType!=MALLOC && allocType!=SHARED && allocType!=MMAP){ //Por si non queremos que sexa de un tipo en concreto
+        for(p = L;(p != NULL) && (p -> data.size != tam); p = p -> next);
+    }
+    else{
+        for(p = L;(p != NULL) && (p -> data.size != tam) && (p->data.allocType!=allocType); p = p -> next);
+    }
+    return p;
+}
+
 void deleteAtPositionM(tPosM pos, tListM *L){
     tPosM q;
 

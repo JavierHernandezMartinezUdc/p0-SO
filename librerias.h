@@ -13,3 +13,4 @@
 #include <libgen.h>
 #include <math.h>
 #include <sys/utsname.h> //Utilizase en infosys
+#include <sys/wait.h>
