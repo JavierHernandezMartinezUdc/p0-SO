@@ -15,8 +15,9 @@ paula.carril@udc.es
 #include "shellopenfiles.h"
 #include "historic.h"
 #include "p1.h"
+#include "p2.h"
 
-void comandN(int numWords, char *trozos[], tListH *H, bool *terminado, tListF *L);
+void comandN(int numWords, char *trozos[], tListH *H, bool *terminado, tListF *L, tListM *M);
 /*
 //En trozos[0] gardase o comando e a partir de trozos[1] os argumentos
 int TrocearCadena(char* cadena, char* trozos[]){
@@ -41,10 +42,10 @@ void leerComando(char *comando){
 
 int elegirComando(char *comando){
     int i;
-    char *comandosDisponibles[21]={"authors","pid","chdir","date","time","hist","command","open","close","dup","listopen","infosys","help","bye","exit","quit","create","stat","list","delete","deltree"};
-    //21 de tamaño porque se el numero de comandos que hay. Aumentaran en practicas consecutivas
+    char *comandosDisponibles[30]={"authors","pid","chdir","date","time","hist","command","open","close","dup","listopen","infosys","help","bye","exit","quit","create","stat","list","delete","deltree","malloc","shared","mmap","read","write","memdump","memfill","mem","recurse"};
+    //30 de tamaño porque se el numero de comandos que hay. Aumentaran en practicas consecutivas
 
-    for(i=0;i<21;i++){ //Cambiar segun tamaño array
+    for(i=0;i<30;i++){ //Cambiar segun tamaño array
         if(strcmp(comando,comandosDisponibles[i])==0){
             return i;
         }
@@ -392,7 +393,7 @@ void salir(bool *terminado){
     *terminado=1;
 }
 
-void procesarComando(int numWords, int comando, char *trozos[], bool *terminado, tListF *L, tListH *H){
+void procesarComando(int numWords, int comando, char *trozos[], bool *terminado, tListF *L, tListH *H, tListM *M){
     switch(comando){
         case 0:
             authors(trozos);
@@ -413,7 +414,7 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             hist(H,trozos);
             break;
         case 6:
-            comandN(numWords,trozos,H,terminado,L);
+            comandN(numWords,trozos,H,terminado,L,M);
             break;
         case 7:
             Cmd_open(trozos, L);
@@ -457,6 +458,33 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
         case 20:
             deltree(trozos);
             break;
+        case 21:
+            //malloc
+            break;
+        case 22:
+            //shared
+            break;
+        case 23:
+            //mmap
+            break;
+        case 24:
+            //read
+            break;
+        case 25:
+            //write
+            break;
+        case 26:
+            //memdump
+            break;
+        case 27:
+            //memfill
+            break;
+        case 28:
+            //mem
+            break;
+        case 29:
+            //recurse
+            break;            
         default:
             printf("No ejecutado: No such file or directory\n");
             break;
@@ -513,24 +541,27 @@ int main(){
     int eleccionComando, numWords;
     tListF L;
     tListH H;
+    tListM M;
 
     createEmptyListF(&L);
     insertarESstd(&L);
 
     createEmptyListH(&H);
 
+    createEmptyListM(&M);
+
     while(!terminado){
         imprimirPrompt();
         leerComando(comando);
         if(strcmp(comando,"\n")!=0){
             //Formato para hist
-        strcpy(comandoCompleto,comando);
-        strtok(comandoCompleto,"\n");
-        //Formato para hist
-        numWords=TrocearCadena(comando, trozos);
-        eleccionComando=elegirComando(trozos[0]);
-        insertarComandoHist(&H, comandoCompleto);
-        procesarComando(numWords, eleccionComando, trozos, &terminado, &L, &H);
+            strcpy(comandoCompleto,comando);
+            strtok(comandoCompleto,"\n");
+            //Formato para hist
+            numWords=TrocearCadena(comando, trozos);
+            eleccionComando=elegirComando(trozos[0]);
+            insertarComandoHist(&H, comandoCompleto);
+            procesarComando(numWords, eleccionComando, trozos, &terminado, &L, &H,&M);
         }
     }
 
@@ -539,6 +570,7 @@ int main(){
 
     listMemFree(&L);
     deleteListH(&H);
+    deleteListM(&M);
     free(comando);
     free(trozos);
     free(comandoCompleto);
@@ -546,7 +578,7 @@ int main(){
     return 0;
 }
 
-void comandN(int numWords, char *trozos[], tListH *H, bool *terminado, tListF *L){
+void comandN(int numWords, char *trozos[], tListH *H, bool *terminado, tListF *L, tListM *M){
     tPosH i;
     tItemH p;
     tPosH q;
@@ -576,7 +608,7 @@ void comandN(int numWords, char *trozos[], tListH *H, bool *terminado, tListF *L
         
             TrocearCadena(p.nombre,trozos);
             printf("Ejecutando el hist (%d): %s\n",x,trozos[0]);
-            procesarComando(numWords, elegirComando(trozos[0]),trozos,terminado, L, H);
+            procesarComando(numWords, elegirComando(trozos[0]),trozos,terminado, L, H, M);
         }
     }
 }

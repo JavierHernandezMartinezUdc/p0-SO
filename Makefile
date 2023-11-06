@@ -6,6 +6,9 @@ p0.o:
 p1.o:
 	gcc -c -g p1.c
 
+p2.o:
+	gcc -c -g p2.c
+
 listaF.o:
 	gcc -c shellopenfiles.c
 
@@ -15,8 +18,8 @@ listaH.o:
 listaM.o:
 	gcc -c mem.c
 
-compilar: p0.o p1.o listaF.o listaH.o listaM.o
-	gcc -Wall -o p0 p0.o p1.o shellopenfiles.o historic.o mem.o
+compilar: p0.o p1.o p2.o listaF.o listaH.o listaM.o
+	gcc -Wall -o p0 p0.o p1.o p2.o shellopenfiles.o historic.o mem.o
 	rm -f *.o
 
 ejecutar:
