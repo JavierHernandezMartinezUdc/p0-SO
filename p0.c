@@ -541,12 +541,12 @@ void insertarComandoHist(tListH *L, char *comando){
     insertItemH(p,L);
 }
 
-void freeMallocAsignedBlocks(tListM *M){
+void freeMallocAsignedBlocks(tListM M){
     tPosM p;
     tItemM q;
 
-    for(p=firstM(*M);p!=NULL;p=nextM(p,*M)){
-        q=getItemM(p,*M);
+    for(p=firstM(M);p!=NULL;p=nextM(p,M)){
+        q=getItemM(p,M);
         if(q.allocType==MALLOC){
             free(q.direccion);
         }
@@ -589,7 +589,7 @@ int main(){
     //printf("Comando %s. argumento %s\n",comando,trozos[1]);
 
     //Liberar bloques de memoria asignados
-    freeMallocAsignedBlocks(&M);
+    freeMallocAsignedBlocks(M);
 
     listMemFree(&L);
     deleteListH(&H);
