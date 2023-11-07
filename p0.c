@@ -485,7 +485,7 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             //memdump
             break;
         case 27:
-            //memefill
+            memFillCmd(trozos);
             break;
         case 28:
             //mem
