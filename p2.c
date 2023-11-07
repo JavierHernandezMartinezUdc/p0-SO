@@ -46,6 +46,8 @@ void LlenarMemoria (void *p, size_t cont, unsigned char byte){
   unsigned char *arr=(unsigned char *) p;
   size_t i;
 
+  printf("Llenando %d bytes de memoria con el byte %c(%x) a partir de la direccion %p\n",(int)cont, byte, byte, p);
+
   for (i=0; i<cont;i++)
 		arr[i]=byte;
 }
@@ -61,20 +63,20 @@ void memFillCmd(char **trozos, int numWords){
         p=(void *)strtol(trozos[1],NULL,16);
 
         if(numWords==2){
-            printf("Llenando 128 bytes de memoria con el byte %c(%x) a partir de la direccion %p\n",porDefecto,porDefecto,p);
+            //printf("Llenando 128 bytes de memoria con el byte %c(%x) a partir de la direccion %p\n",porDefecto,porDefecto,p);
             LlenarMemoria(p, 128, porDefecto);
         }
         else if(numWords==3){
-            printf("Llenando %d bytes de memoria con el byte %c(%x) a partir de la direccion %p\n",atoi(trozos[2]),porDefecto,porDefecto,p);
+            //printf("Llenando %d bytes de memoria con el byte %c(%x) a partir de la direccion %p\n",atoi(trozos[2]),porDefecto,porDefecto,p);
             LlenarMemoria(p, atoi(trozos[2]), porDefecto);
         }
         else{
             if(trozos[3][1]=='x'){
-                printf("Llenando %d bytes de memoria con el byte %c(%x) a partir de la direccion %p\n",atoi(trozos[2]),(int)strtol(trozos[3],NULL,16),(int)strtol(trozos[3],NULL,16),p);
+                //printf("Llenando %d bytes de memoria con el byte %c(%x) a partir de la direccion %p\n",atoi(trozos[2]),(int)strtol(trozos[3],NULL,16),(int)strtol(trozos[3],NULL,16),p);
                 LlenarMemoria(p, atoi(trozos[2]), strtol(trozos[3],NULL,16));
             }
             else{
-                printf("Llenando %d bytes de memoria con el byte %c(%x) a partir de la direccion %p\n",atoi(trozos[2]),(int)strtol(trozos[3],NULL,10),(int)strtol(trozos[3],NULL,10),p);
+                //printf("Llenando %d bytes de memoria con el byte %c(%x) a partir de la direccion %p\n",atoi(trozos[2]),(int)strtol(trozos[3],NULL,10),(int)strtol(trozos[3],NULL,10),p);
                 LlenarMemoria(p, atoi(trozos[2]), strtol(trozos[3],NULL,10));
             }
         }
