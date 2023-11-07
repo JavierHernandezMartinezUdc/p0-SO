@@ -38,3 +38,4 @@ tPosM findItemM(size_t tam, tAllocType allocType, tListM L);
 void deleteAtPositionM(tPosM pos, tListM *L);
 void deleteListM(tListM *L);
 bool insertItemM(tItemM d, tListM *L);
+tPosM nextM(tPosM p, tListM L);

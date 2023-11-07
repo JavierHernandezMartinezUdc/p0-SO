@@ -20,15 +20,24 @@ void mallocCmd(char **trozos, tListM *M){
         }
     }
     else{
-        if((m.direccion=malloc(atoi(trozos[1])))==NULL){
-            perror("Sin memoria");
+        if(atoi(trozos[1])!=0){
+            if((m.direccion=malloc(atoi(trozos[1])))==NULL){
+                perror("Sin memoria");
+            }
+            else{
+                m.size=atoi(trozos[1]);
+                time(&m.allocTime);
+                m.allocType=MALLOC;
+                if(insertItemM(m,M)==false){
+                    printf("Imposible hacer malloc\n");
+                }
+                else{
+                    printf("Asignados %d bytes en %p\n",(int)m.size,m.direccion);
+                }
+            }
         }
         else{
-            m.size=atoi(trozos[1]);
-            time(&m.allocTime);
-            m.allocType=MALLOC;
-            insertItemM(m,M);
-            printf("Asignados %d bytes en %p\n",(int)m.size,m.direccion);
+            printf("No se asignan bloques de 0 bytes\n");
         }
     }
 }
@@ -41,9 +50,35 @@ void LlenarMemoria (void *p, size_t cont, unsigned char byte){
 		arr[i]=byte;
 }
 
-void memFillCmd(char **trozos){
-    //Control de datos
-    //LlenarMemoria(); Chamamos a funcion despois do control
+void memFillCmd(char **trozos, int numWords){
+    void *p;
+    unsigned char porDefecto = 'A';
+
+    if(numWords==1 || numWords>4){
+        printf("Numero de argumentos no validos\n");
+    }
+    else{
+        p=(void *)strtol(trozos[1],NULL,16);
+
+        if(numWords==2){
+            printf("Llenando 128 bytes de memoria con el byte %c(%x) a partir de la direccion %p\n",porDefecto,porDefecto,p);
+            LlenarMemoria(p, 128, porDefecto);
+        }
+        else if(numWords==3){
+            printf("Llenando %d bytes de memoria con el byte %c(%x) a partir de la direccion %p\n",atoi(trozos[2]),porDefecto,porDefecto,p);
+            LlenarMemoria(p, atoi(trozos[2]), porDefecto);
+        }
+        else{
+            if(trozos[3][1]=='x'){
+                printf("Llenando %d bytes de memoria con el byte %c(%x) a partir de la direccion %p\n",atoi(trozos[2]),(int)strtol(trozos[3],NULL,16),(int)strtol(trozos[3],NULL,16),p);
+                LlenarMemoria(p, atoi(trozos[2]), strtol(trozos[3],NULL,16));
+            }
+            else{
+                printf("Llenando %d bytes de memoria con el byte %c(%x) a partir de la direccion %p\n",atoi(trozos[2]),(int)strtol(trozos[3],NULL,10),(int)strtol(trozos[3],NULL,10),p);
+                LlenarMemoria(p, atoi(trozos[2]), strtol(trozos[3],NULL,10));
+            }
+        }
+    }
 }
 
 void Recursiva (int n){

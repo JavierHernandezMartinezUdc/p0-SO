@@ -485,7 +485,7 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             //memdump
             break;
         case 27:
-            memFillCmd(trozos);
+            memFillCmd(trozos,numWords);
             break;
         case 28:
             //mem
@@ -541,6 +541,18 @@ void insertarComandoHist(tListH *L, char *comando){
     insertItemH(p,L);
 }
 
+void freeMallocAsignedBlocks(tListM *M){
+    tPosM p;
+    tItemM q;
+
+    for(p=firstM(*M);p!=NULL;p=nextM(p,*M)){
+        q=getItemM(p,*M);
+        if(q.allocType==MALLOC){
+            free(q.direccion);
+        }
+    }
+}
+
 int main(){
     bool terminado=0;
     char *comando=malloc(100);
@@ -575,6 +587,9 @@ int main(){
 
     //printf("Numero de trozos del comando: %d\n",TrocearCadena(comando, trozos));
     //printf("Comando %s. argumento %s\n",comando,trozos[1]);
+
+    //Liberar bloques de memoria asignados
+    freeMallocAsignedBlocks(&M);
 
     listMemFree(&L);
     deleteListH(&H);

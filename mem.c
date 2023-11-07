@@ -87,3 +87,7 @@ bool insertItemM(tItemM d, tListM *L){
         return true;
     }
 }
+
+tPosM nextM(tPosM p, tListM L){
+    return p->next;
+}
