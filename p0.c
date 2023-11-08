@@ -383,6 +383,24 @@ void help(char *trozos[]) {
             printf("delete [name1 name2 ...]        Borra ficheros o directorios vacios\n"); //2 tabulados
         } else if (strcmp(trozos[1], "deltree") == 0) {
             printf("deltree [name1 name2 ...]       Borra ficheros o directorios no vacios recursivamente\n"); //2 tabulados
+        } else if(strcmp(trozos[1], "malloc") == 0){ //TODO completar novos comandos
+            printf("");
+        } else if(strcmp(trozos[1], "shared") == 0){
+            printf("");
+        } else if(strcmp(trozos[1], "mmap") == 0){
+            printf("");
+        } else if(strcmp(trozos[1], "read") == 0){
+            printf("");
+        } else if(strcmp(trozos[1], "write") == 0){
+            printf("");
+        } else if(strcmp(trozos[1], "memdump") == 0){
+            printf("");
+        } else if(strcmp(trozos[1], "memfill") == 0){
+            printf("");
+        } else if(strcmp(trozos[1], "mem") == 0){
+            printf("");
+        } else if(strcmp(trozos[1], "recurse") == 0){
+            printf("");
         } else {
             printf("%s no encontrado\n", trozos[1]);
         }
