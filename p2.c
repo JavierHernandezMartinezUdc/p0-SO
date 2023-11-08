@@ -21,7 +21,7 @@ void mallocCmd(char **trozos, tListM *M){
     }
     else{
         if(atoi(trozos[1])!=0){
-            if((m.direccion=malloc(atoi(trozos[1])))==NULL){
+            if((m.direccion=calloc(atoi(trozos[1]),1))==NULL){
                 perror("Sin memoria");
             }
             else{
@@ -42,17 +42,34 @@ void mallocCmd(char **trozos, tListM *M){
     }
 }
 
-void memDump(void *address, size_t size){ //TODO falta imprimir o char encima do hex
+void memDump(void *address, size_t size){
     unsigned char *ptr = (unsigned char *)address;
+    int veces=0,pos_char;
+    size_t i,j;
     
-    for(size_t i=0;i<size;i++){
-        printf("%02X ",ptr[i]);
+    for(i=0;i<size;i++){
+        if(ptr[i]>=32 && ptr[i]<=126){
+            printf("%4c",ptr[i]);
+        }else{
+            printf("    ");
+        }
+        veces++;
 
-        if((i+1)%25==0 && i!=0){
+        if(veces%25==0 && veces!=0){
             printf("\n");
+            pos_char=i+1-veces;;
+            for(j=pos_char;j<pos_char+veces;j++){
+                if(ptr[j]==0){
+                    printf("  00");
+                }
+                else{
+                    printf("  %02X",ptr[j]);
+                }
+            }
+            printf("\n");
+            veces=0;
         }
     }
-    printf("\n");
 }
 
 void memDumpCmd(char **trozos){
@@ -60,7 +77,14 @@ void memDumpCmd(char **trozos){
 
     p=(void *)strtol(trozos[1],NULL,16);
 
-    memDump(p,atoi(trozos[2]));
+    if(trozos[1]!=NULL){
+        if(trozos[2]==NULL){
+            memDump(p,25);
+        }
+        else{
+            memDump(p,atoi(trozos[2]));
+        }
+    }
 }
 
 void LlenarMemoria (void *p, size_t cont, unsigned char byte){
