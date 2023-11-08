@@ -42,6 +42,27 @@ void mallocCmd(char **trozos, tListM *M){
     }
 }
 
+void memDump(void *address, size_t size){ //TODO falta imprimir o char encima do hex
+    unsigned char *ptr = (unsigned char *)address;
+    
+    for(size_t i=0;i<size;i++){
+        printf("%02X ",ptr[i]);
+
+        if((i+1)%25==0 && i!=0){
+            printf("\n");
+        }
+    }
+    printf("\n");
+}
+
+void memDumpCmd(char **trozos){
+    void *p;
+
+    p=(void *)strtol(trozos[1],NULL,16);
+
+    memDump(p,atoi(trozos[2]));
+}
+
 void LlenarMemoria (void *p, size_t cont, unsigned char byte){
   unsigned char *arr=(unsigned char *) p;
   size_t i;

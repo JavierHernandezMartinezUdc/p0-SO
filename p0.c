@@ -482,7 +482,7 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             //write
             break;
         case 26:
-            //memdump
+            memDumpCmd(trozos);
             break;
         case 27:
             memFillCmd(trozos,numWords);
