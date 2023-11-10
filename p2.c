@@ -67,6 +67,7 @@ void CmdRead (char *ar[])
    void *p;
    size_t cont=-1;  /* -1 indica leer todo el fichero*/
    ssize_t n;
+
    if (ar[1]==NULL || ar[2]==NULL){
         printf ("Faltan parametros\n");
         return;
@@ -80,6 +81,104 @@ void CmdRead (char *ar[])
 	    perror ("Imposible leer fichero");
    else
 	    printf ("Leidos %lld bytes de %s en %p\n",(long long) n,ar[1],p);
+}
+
+void EscribirFichero(char *f, void *p, size_t cont, bool o){
+    char ruta[1024];
+    getcwd(ruta,1024);
+
+    DIR *dir=opendir(ruta);
+    struct dirent *entrada;
+    bool existe=false;
+    int df;
+
+    if(dir==NULL){
+        perror("Error al abrir el directorio");
+        return;
+    }
+
+    while((entrada=readdir(dir))!=NULL){
+        if(strcmp(entrada->d_name,f)==0){
+            existe=true;
+        }
+    }
+
+    closedir(dir);
+
+    if(!existe || !o){
+        //Crear archivo
+        df=open(f,O_CREAT | O_EXCL, 0777);
+        if(df==-1){
+            perror("Imposible crear");
+            return;
+        }
+        else{
+            close(df);
+        }
+
+        //Abrir archivo
+        FILE *archivo=fopen(f,"w");
+        if(archivo==NULL){
+            perror("Error al abrir");
+            return;
+        }
+
+        //Escribir archivo
+        size_t escritos=fwrite((char *)p, sizeof(char), cont, archivo);
+        if(escritos!=cont){
+            perror("Error al escribir");
+            fclose(archivo);
+            return;
+        }
+
+        //Cerrar archivo
+        fclose(archivo);
+
+        printf("Escritos %lld bytes en %s en %p\n",(long long)escritos, f, p);
+    }
+    else{
+        FILE *archivo=fopen(f,"w");
+        if(archivo==NULL){
+            perror("Error al abrir");
+            return;
+        }
+
+        //Escribir archivo
+        size_t escritos=fwrite((char *)p, sizeof(char), cont, archivo);
+        if(escritos!=cont){
+            perror("Error al escribir");
+            fclose(archivo);
+            return;
+        }
+
+        //Cerrar archivo
+        fclose(archivo);
+
+        printf("Escritos %lld bytes en %s en %p\n",(long long)escritos, f, p);
+    }
+
+}
+
+void CmdWrite(char **trozos){
+    void *p;
+    
+    if(strcmp(trozos[1],"-o")==0){
+        if(trozos[4]==NULL){
+            printf("Faltan parametros\n");
+            return;
+        }
+        p=(void *)strtol(trozos[3],NULL,16);
+        EscribirFichero(trozos[2],p,atoi(trozos[4]),true);
+    }
+    else{
+        if(trozos[3]==NULL){
+            printf("Faltan parametros\n");
+            return;
+        }
+        p=(void *)strtol(trozos[2],NULL,16);
+        EscribirFichero(trozos[1],p,atoi(trozos[3]),false);
+    }
+
 }
 
 void memDump(void *address, size_t size){
