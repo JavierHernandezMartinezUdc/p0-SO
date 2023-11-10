@@ -105,18 +105,7 @@ void EscribirFichero(char *f, void *p, size_t cont, bool o){
 
     closedir(dir);
 
-    if(!existe || !o){
-        //Crear archivo
-        df=open(f,O_CREAT | O_EXCL, 0777);
-        if(df==-1){
-            perror("Imposible crear");
-            return;
-        }
-        else{
-            close(df);
-        }
-
-        //Abrir archivo
+    if(existe && o){
         FILE *archivo=fopen(f,"w");
         if(archivo==NULL){
             perror("Error al abrir");
@@ -137,6 +126,16 @@ void EscribirFichero(char *f, void *p, size_t cont, bool o){
         printf("Escritos %lld bytes en %s en %p\n",(long long)escritos, f, p);
     }
     else{
+        df=open(f,O_CREAT | O_EXCL, 0777);
+        if(df==-1){
+            perror("Imposible crear");
+            return;
+        }
+        else{
+            close(df);
+        }
+
+        //Abrir archivo
         FILE *archivo=fopen(f,"w");
         if(archivo==NULL){
             perror("Error al abrir");
