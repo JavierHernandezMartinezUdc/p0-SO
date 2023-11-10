@@ -42,20 +42,63 @@ void mallocCmd(char **trozos, tListM *M){
     }
 }
 
+ssize_t LeerFichero (char *f, void *p, size_t cont)
+{
+   struct stat s;
+   ssize_t  n;  
+   int df,aux;
+
+   if (stat (f,&s)==-1 || (df=open(f,O_RDONLY))==-1)
+	    return -1;     
+   if (cont==-1)   /* si pasamos -1 como bytes a leer lo leemos entero*/
+	    cont=s.st_size;
+   if ((n=read(df,p,cont))==-1){
+	    aux=errno;
+	    close(df);
+	    errno=aux;
+	    return -1;
+   }
+   close (df);
+   return n;
+}
+
+void CmdRead (char *ar[])
+{
+   void *p;
+   size_t cont=-1;  /* -1 indica leer todo el fichero*/
+   ssize_t n;
+   if (ar[1]==NULL || ar[2]==NULL){
+        printf ("Faltan parametros\n");
+        return;
+   }
+   //p=cadtop(ar[2]);  /*convertimos de cadena a puntero*/
+   p=(void *)strtol(ar[2],NULL,16);
+   if (ar[3]!=NULL)
+	    cont=(size_t) atoll(ar[3]);
+
+   if ((n=LeerFichero(ar[1],p,cont))==-1)
+	    perror ("Imposible leer fichero");
+   else
+	    printf ("Leidos %lld bytes de %s en %p\n",(long long) n,ar[1],p);
+}
+
 void memDump(void *address, size_t size){
     unsigned char *ptr = (unsigned char *)address;
-    int veces=0,pos_char;
+    int veces=0,pos_char,lineas=0;
     size_t i,j;
     
     for(i=0;i<size;i++){
         if(ptr[i]>=32 && ptr[i]<=126){
             printf("%4c",ptr[i]);
+        }else if(ptr[i]==10){ //Caso particular para \n
+            printf("%4s","\\n");
         }else{
             printf("    ");
         }
         veces++;
 
-        if(veces%25==0 && veces!=0){
+        if((veces%25==0 && veces!=0) || veces+25*lineas==size){
+            lineas++;
             printf("\n");
             pos_char=i+1-veces;;
             for(j=pos_char;j<pos_char+veces;j++){

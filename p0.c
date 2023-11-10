@@ -494,7 +494,7 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             //mmap
             break;
         case 24:
-            //read
+            CmdRead(trozos);
             break;
         case 25:
             //write
