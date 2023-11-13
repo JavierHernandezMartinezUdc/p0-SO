@@ -21,7 +21,7 @@ void mallocCmd(char **trozos, tListM *M){
     }
     else{
         if(atoi(trozos[1])!=0){
-            if((m.direccion=malloc(atoi(trozos[1])))==NULL){
+            if((m.direccion=calloc(atoi(trozos[1]),1))==NULL){
                 perror("Sin memoria");
             }
             else{
@@ -200,15 +200,13 @@ void memDump(void *address, size_t size){
             printf("\n");
             pos_char=i+1-veces;;
             for(j=pos_char;j<pos_char+veces;j++){
-                /* TODO preguntar por calloc
                 if(ptr[j]==0){ 
                     printf("  00");
                 }
                 else{
                     printf("  %02X",ptr[j]);
                 }
-                */
-                printf("  %02X",ptr[j]);
+                //printf("  %02X",ptr[j]);
             }
             printf("\n");
             veces=0;
