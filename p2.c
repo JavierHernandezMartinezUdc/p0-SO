@@ -235,7 +235,7 @@ void LlenarMemoria (void *p, size_t cont, unsigned char byte){
   unsigned char *arr=(unsigned char *) p;
   size_t i;
 
-  printf("Llenando %d bytes de memoria con el byte %c(%x) a partir de la direccion %p\n",(int)cont, byte, byte, p);
+  printf("Llenando %d bytes de memoria con el byte %c(%02x) a partir de la direccion %p\n",(int)cont, byte, byte, p);
 
   for (i=0; i<cont;i++)
 		arr[i]=byte;
