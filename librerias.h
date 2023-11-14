@@ -15,3 +15,6 @@
 #include <sys/utsname.h> //Utilizase en infosys
 #include <sys/wait.h>
 #include <errno.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/mman.h>

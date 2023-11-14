@@ -7,40 +7,104 @@ int int_glocal = 0;
 char char_glocal = 'r';
 double float_glocal = 1.2;
 
-void list_print(tAllocType ref, M){
+void FechaHora(time_t t, char *dest){
+    struct tm *local_time = localtime(&t);
+    char mesString[1024];
+
+    if (local_time == NULL) {
+        perror("localtime");
+        return;
+    }
+
+    int dia = local_time->tm_mday;
+    int mes = local_time->tm_mon + 1;
+    int hor = local_time->tm_hour;
+    int min = local_time->tm_min;
+
+    switch (mes) {
+        case 1:
+            strcpy(mesString,"Ene");
+            break;
+        case 2:
+            strcpy(mesString,"Feb");
+            break;
+        case 3:
+            strcpy(mesString,"Mar");
+            break;
+        case 4:
+            strcpy(mesString,"Abr");
+            break;
+        case 5:
+            strcpy(mesString,"May");
+            break;
+        case 6:
+            strcpy(mesString,"Jun");
+            break;
+        case 7:
+            strcpy(mesString,"Jul");
+            break;
+        case 8:
+            strcpy(mesString,"Ago");
+            break;
+        case 9:
+            strcpy(mesString,"Sep");
+            break;
+        case 10:
+            strcpy(mesString,"Oct");
+            break;
+        case 11:
+            strcpy(mesString,"Nov");
+            break;
+        case 12:
+            strcpy(mesString,"Dic");
+            break;
+        default:
+            strcpy(mesString,"???");
+            break;
+    }
+
+    sprintf(dest,"%s %d %d:%d",mesString,dia,hor,min);
+}
+
+void list_print(tAllocType ref, tListM M){
     tPosM p;
-    tItemM x;
-    char *tipo;
-    if(ref==MALLOC){
-        strcpy(tipo,"malloc");
-    }
-    if(ref==SHARED){
-        strcpy(tipo,"shared");
-    }
-    if(ref==MMAP){
-        strcpy(tipo,"mmap");
-    }
-    if(ref!=SHARED && ref!=MMAP && ref!=MALLOC){
-        printf("******Lista de bloques asignados para el proceso %d\n", getpid());
-        for(p = firstM(M);p!=NULL;p=nextM(p)){
-            x = getItemM(p);
-            if(x.allocType==MALLOC){
+    tItemM m;
+    char tipo[7];
+    char fecha[13];
+
+    if(ref==null){
+        for(p=firstM(M);p!=NULL;p=nextM(p,M)){
+            m=getItemM(p,M);
+            FechaHora(m.allocTime,fecha);
+
+            if(m.allocType==MALLOC){
                 strcpy(tipo,"malloc");
             }
-            if(x.allocType==SHARED){
+            else if(m.allocType==SHARED){
                 strcpy(tipo,"shared");
             }
-            if(x.allocType==MMAP){
+            else if(m.allocType==MMAP){
                 strcpy(tipo,"mmap");
             }
-            printf("%x %d %s (key %d)", x.direccion, x.size, /*TODO fecha*/,x.allocType, x.Type.key);
+            printf("      %p\t\t%d (%s) %s\n",m.direccion,(int)m.size,fecha,tipo);
         }
-    } else {
-        printf("******Lista de bloques asignados %s para el proceso %d\n", tipo, getpid());
-        for (p = firstM(M); p != NULL; p = nextM(p)) {
-            x = getItemM(p);
-            if (x.allocType == ref) {
-                printf("%x %d %s (key %d)", x.direccion, x.size, /*TODO fecha*/, tipo, x.Type.key);
+    }
+    else{
+        for(p=firstM(M);p!=NULL;p=nextM(p,M)){
+            m=getItemM(p,M);
+            FechaHora(m.allocTime,fecha);
+
+            if(m.allocType==ref){
+                if(ref==MALLOC){
+                    strcpy(tipo,"malloc");
+                }
+                else if(ref==SHARED){
+                    strcpy(tipo,"shared");
+                }
+                else if(ref==MMAP){
+                    strcpy(tipo,"mmap");
+                }
+                printf("      %p\t\t%d (%s) %s\n",m.direccion,(int)m.size,fecha,tipo);
             }
         }
     }
@@ -67,12 +131,14 @@ void * ObtenerMemoriaShmget (key_t clave, size_t tam,tListM *M)
         return (NULL);
     }
     shmctl (id,IPC_STAT,&s);
+
     item.allocType=SHARED;
     item.size=tam;
     time(&item.allocTime);
     item.Type.key=clave;
-    item.direccion=id;
+    item.direccion=p;
     insertItemM(item, M);
+    
     return (p);
 }
 void SharedCreate (char *tr[],tListM *M)
@@ -91,42 +157,6 @@ void SharedCreate (char *tr[],tListM *M)
         printf ("Asignados %lu bytes en %p\n",(unsigned long) tam, p);
     else
         printf ("Imposible asignar memoria compartida clave %lu:%s\n",(unsigned long) cl,strerror(errno));
-}
-
-
-void * MapearFichero (char * fichero, int protection)
-{
-    int df, map=MAP_PRIVATE,modo=O_RDONLY;
-    struct stat s;
-    void *p;
-
-    if (protection&PROT_WRITE)
-        modo=O_RDWR;
-    if (stat(fichero,&s)==-1 || (df=open(fichero, modo))==-1)
-        return NULL;
-    if ((p=mmap (NULL,s.st_size, protection,map,df,0))==MAP_FAILED)
-        return NULL;
-/* Guardar en la lista    InsertarNodoMmap (&L,p, s.st_size,df,fichero); */
-    return p;
-}
-
-void CmdMmap(char *arg[],tListM *M)
-{
-    char *perm;
-    void *p;
-    int protection=0;
-
-    if (arg[0]==NULL)
-    {ImprimirListaMmap(*M); return;}
-    if ((perm=arg[1])!=NULL && strlen(perm)<4) {
-        if (strchr(perm,'r')!=NULL) protection|=PROT_READ;
-        if (strchr(perm,'w')!=NULL) protection|=PROT_WRITE;
-        if (strchr(perm,'x')!=NULL) protection|=PROT_EXEC;
-    }
-    if ((p=MapearFichero(arg[0],protection))==NULL)
-        perror ("Imposible mapear fichero");
-    else
-        printf ("fichero %s mapeado en %p\n", arg[0], p);
 }
 
 void SharedDelkey (char *args[])
@@ -148,121 +178,75 @@ void SharedDelkey (char *args[])
 }
 
 void shared (char **trozos, tListM *M){
-    tItemM p;
-    if (strcmp(trozos[1], "-create") == 0) {
-        if (tr[2]==NULL || tr[3]==NULL) {
-            shared_list(M);
+    tPosM p;
+    tItemM x;
+    void *q;
+
+    if(trozos[1]==NULL){
+        printf("******Lista de bloques asignados shared para el proceso %d\n",getpid());
+        list_print(SHARED,*M);
+    }
+    else if (strcmp(trozos[1], "-create") == 0) {
+        if (trozos[2]==NULL || trozos[3]==NULL) {
+            printf("******Lista de bloques asignados shared para el proceso %d\n",getpid());
+            list_print(SHARED,*M);
             return;
         }
         SharedCreate(trozos,M);}
-    else if (strcmp(trozos[1], "-delkey") == 0) { SharedDelkey(trozos);}
+    else if (strcmp(trozos[1], "-delkey") == 0) {SharedDelkey(trozos);}
     else if (strcmp(trozos[1], "-free") == 0) {
-        p=getItemM(findItemSharedM((atoi(trozos[3]), SHARED, *M);
-        if(p==NULL){printf("No hay bloque de esa clave mapeado en el proceso\n");return;}
-        if (shmdt(p.direccion) == -1) {
+        p=findItemSharedM(atoi(trozos[2]), SHARED, *M);
+
+        if(p==NULL){
+            printf("No hay bloque de esa clave mapeado en el proceso\n");
+            return;
+        }
+
+        x=getItemM(p,*M);
+        if (shmdt(x.direccion) == -1) {
             perror("shmdt");
             exit(EXIT_FAILURE);
         }
+
+        deleteAtPositionM(p,M);
     }
     else{
-        list_print(SHARED, *M);
+        //TODO Esto da error por algun motivo
+        struct shmid_ds s;;
+        if (shmctl(atoi(trozos[1]), IPC_STAT, &s) == -1) {
+            perror("shmctl info");
+            return;
+        }
+
+        //Asignar memoria a partir de una clave
+        q=shmat(atoi(trozos[1]),NULL,0777);
+
+        x.direccion=q;
+        time(&x.allocTime);
+        x.size=s.shm_segsz;
+        x.allocType=SHARED;
+        x.Type.key=atoi(trozos[1]);
+
+        printf("Memoria compartida en clave %d en %p",atoi(trozos[1]),q);
     }
 }
-
-void Do_MemPmap (void) /*sin argumentos*/
-{ pid_t pid;       /*hace el pmap (o equivalente) del proceso actual*/
-    char elpid[32];
-    char *argv[4]={"pmap",elpid,NULL};
-
-    sprintf (elpid,"%d", (int) getpid());
-    if ((pid=fork())==-1){
-        perror ("Imposible crear proceso");
-        return;
-    }
-    if (pid==0){ /*proceso hijo*/
-        if (execvp(argv[0],argv)==-1)
-            perror("cannot execute pmap (linux, solaris)");
-
-        argv[0]="vmmap"; argv[1]="-interleave"; argv[2]=elpid;argv[3]=NULL;
-        if (execvp(argv[0],argv)==-1) /*probamos vmmap Mac-OS*/
-            perror("cannot execute vmmap (Mac-OS)");
-
-        argv[0]="procstat"; argv[1]="vm"; argv[2]=elpid; argv[3]=NULL;
-        if (execvp(argv[0],argv)==-1)/*No hay pmap, probamos procstat FreeBSD */
-            perror("cannot execute procstat (FreeBSD)");
-
-        argv[0]="procmap",argv[1]=elpid;argv[2]=NULL;
-        if (execvp(argv[0],argv)==-1)  /*probamos procmap OpenBSD*/
-            perror("cannot execute procmap (OpenBSD)");
-
-        exit(1);
-    }
-    waitpid (pid,NULL,0);
-}
-
-void mem(char **trozos, tListM M){ //Comando Memory
-    bool blocks = false, funcs = false, vars = false, pmap = false;
-
-    //Variables locales creadas
-    int int_local = 0;
-    char char_local = 'r';
-    double float_local = 1.2;
-
-    //Variables estáticas creadas
-    static int int_slocal = 0;
-    static char char_slocal = 'r';
-    static double float_slocal = 1.2;
-
-    if (trozos[1]==NULL || (strcmp(trozos[1], "-all")==0)){
-        blocks = true;
-        funcs = true;
-        vars = true;
-    }
-    else if (strcmp(trozos[1], "-blocks")==0){
-        blocks = true;
-    }
-    else if (strcmp(trozos[1], "-funcs")==0){
-        funcs = true;
-    }
-    else if (strcmp(trozos[1], "-vars")==0){
-        vars = true;
-    }
-    else if (strcmp(trozos[1], "-pmap")==0){
-        pmap = true;
-    }
-    else {
-        printf("%s no es una opción\n", trozos[1]);
-    }
-
-    if(vars){
-        printf("Variables locales\t%p,\t%p,\t%p\n", &int_local, &char_local, &float_local);
-        printf("Variables globales\t%p,\t%p,\t%p\n", &int_glocal, &char_glocal, &float_glocal);
-        printf("Variables estaticas\t%p,\t%p,\t%p\n", &int_slocal, &char_slocal, &float_slocal);
-    }
-    if(funcs){
-        printf("Funciones programa\t%p,\t%p,\t%p\n", &comCarpeta, &comFecha, &comAutores);
-        printf("Funciones libreria\t%p,\t%p,\t%p\n", &printf, &malloc, &perror);
-    }
-    if(blocks){
-        list_print(NULL, M);
-    }
-    if (pmap){
-        Do_pmap();
-    }
-    vars = false;
-    funcs = false;
-    blocks = false;
-    pmap = false;
-}
-
+/*
+                |####################################################################################################|
+                |--------------------------------------DESDE AQUI TODO CORRECTO--------------------------------------|
+                |####################################################################################################|
+*/
 void mallocCmd(char **trozos, tListM *M){
     tItemM m;
 
-    if(strcmp(trozos[1],"-free")==0){
+    if(trozos[1]==NULL){
+        printf("******Lista de bloques asignados malloc para el proceso %d\n",getpid());
+        list_print(MALLOC,*M);
+    }
+    else if(strcmp(trozos[1],"-free")==0){
         tPosM p;
 
         //Libera a primeira que encontra, a mais antigua
-        p=findItemM(atoi(trozos[2]),MALLOC,*M);
+        p=findItemMallocM(atoi(trozos[2]),MALLOC,*M);
         if(p==NULL){
             printf("No hay bloque de ese tamano asignado con malloc\n");
         }
@@ -521,6 +505,95 @@ void memFillCmd(char **trozos, int numWords){
             }
         }
     }
+}
+
+void Do_MemPmap (void) /*sin argumentos*/
+{ pid_t pid;       /*hace el pmap (o equivalente) del proceso actual*/
+    char elpid[32];
+    char *argv[4]={"pmap",elpid,NULL};
+
+    sprintf (elpid,"%d", (int) getpid());
+    if ((pid=fork())==-1){
+        perror ("Imposible crear proceso");
+        return;
+    }
+    if (pid==0){ /*proceso hijo*/
+        if (execvp(argv[0],argv)==-1)
+            perror("cannot execute pmap (linux, solaris)");
+
+        argv[0]="vmmap"; argv[1]="-interleave"; argv[2]=elpid;argv[3]=NULL;
+        if (execvp(argv[0],argv)==-1) /*probamos vmmap Mac-OS*/
+            perror("cannot execute vmmap (Mac-OS)");
+
+        argv[0]="procstat"; argv[1]="vm"; argv[2]=elpid; argv[3]=NULL;
+        if (execvp(argv[0],argv)==-1)/*No hay pmap, probamos procstat FreeBSD */
+            perror("cannot execute procstat (FreeBSD)");
+
+        argv[0]="procmap",argv[1]=elpid;argv[2]=NULL;
+        if (execvp(argv[0],argv)==-1)  /*probamos procmap OpenBSD*/
+            perror("cannot execute procmap (OpenBSD)");
+
+        exit(1);
+    }
+    waitpid (pid,NULL,0);
+}
+
+void mem(char **trozos, tListM M){ //TODO cambiar un pouco estructura pa evitar a copia
+    bool blocks = false, funcs = false, vars = false, pmap = false;
+
+    //Variables locales creadas
+    int int_local = 0;
+    char char_local = 'r';
+    double float_local = 1.2;
+
+    //Variables estáticas creadas
+    static int int_slocal = 0;
+    static char char_slocal = 'r';
+    static double float_slocal = 1.2;
+
+    if (trozos[1]==NULL || (strcmp(trozos[1], "-all")==0)){
+        blocks = true;
+        funcs = true;
+        vars = true;
+    }
+    else if (strcmp(trozos[1], "-blocks")==0){
+        blocks = true;
+    }
+    else if (strcmp(trozos[1], "-funcs")==0){
+        funcs = true;
+    }
+    else if (strcmp(trozos[1], "-vars")==0){
+        vars = true;
+    }
+    else if (strcmp(trozos[1], "-pmap")==0){
+        pmap = true;
+    }
+    else {
+        printf("%s no es una opción\n", trozos[1]);
+    }
+
+    if(vars){
+        printf("Variables locales\t%p,\t%p,\t%p\n", &int_local, &char_local, &float_local);
+        printf("Variables globales\t%p,\t%p,\t%p\n", &int_glocal, &char_glocal, &float_glocal);
+        //printf("Var (N.I) globales\t%p,\t%p,\t%p\n", );
+        printf("Variables estaticas\t%p,\t%p,\t%p\n", &int_slocal, &char_slocal, &float_slocal);
+        //printf("Var (N.I) estaticas\t%p,\t%p,\t%p\n", );
+    }
+    if(funcs){
+        printf("Funciones programa\t%p,\t%p,\t%p\n", &mallocCmd, &LlenarMemoria, &EscribirFichero);
+        printf("Funciones libreria\t%p,\t%p,\t%p\n", &printf, &calloc, &shmget);
+    }
+    if(blocks){
+        printf("******Lista de bloques asignados para el proceso %d\n", getpid());
+        list_print(null,M);
+    }
+    if (pmap){
+        Do_MemPmap();
+    }
+    vars = false;
+    funcs = false;
+    blocks = false;
+    pmap = false;
 }
 
 void Recursiva (int n){

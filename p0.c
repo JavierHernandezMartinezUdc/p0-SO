@@ -488,7 +488,7 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             mallocCmd(trozos,M);
             break;
         case 22:
-            //shared
+            shared(trozos,M);
             break;
         case 23:
             //mmap
@@ -506,7 +506,7 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             memFillCmd(trozos,numWords);
             break;
         case 28:
-            //mem
+            mem(trozos, *M);
             break;
         case 29:
             Recursiva(atoi(trozos[1]));

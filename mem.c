@@ -32,9 +32,10 @@ tPosM findItemMallocM(size_t tam, tAllocType allocType, tListM L) {
     }
     return p;
 }
+
 tPosM findItemSharedM(int key, tAllocType allocType, tListM L) {
     tPosM p;
-    for(p = L;(p != NULL) && (p -> data.Type.key != tam) && (p->data.allocType!=allocType); p = p -> next);
+    for(p = L;(p != NULL) && (p -> data.Type.key != key) && (p->data.allocType!=allocType); p = p -> next);
     return p;
 }
 

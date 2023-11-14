@@ -6,7 +6,7 @@ typedef struct{
 }tFile;
 
 typedef enum{
-    MALLOC, SHARED, MMAP
+    MALLOC, SHARED, MMAP, null
 } tAllocType;
 
 typedef struct tItemM{
@@ -34,7 +34,8 @@ bool isEmptyListM(tListM L);
 tPosM firstM(tListM L);
 tPosM lastM(tListM L);
 tItemM getItemM(tPosM pos, tListM L);
-tPosM findItemM(size_t tam, tAllocType allocType, tListM L);
+tPosM findItemMallocM(size_t tam, tAllocType allocType, tListM L);
+tPosM findItemSharedM(int key, tAllocType allocType, tListM L);
 void deleteAtPositionM(tPosM pos, tListM *L);
 void deleteListM(tListM *L);
 bool insertItemM(tItemM d, tListM *L);
