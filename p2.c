@@ -7,6 +7,70 @@ int int_glocal = 0;
 char char_glocal = 'r';
 double float_glocal = 1.2;
 
+void mem(char **trozos, tListM M){ //TODO cambiar un pouco estructura pa evitar a copia
+    bool blocks = false, funcs = false, vars = false, pmap = false;
+
+    //Variables locales creadas
+    int int_local = 0;
+    char char_local = 'r';
+    double float_local = 1.2;
+
+    //Variables estáticas creadas
+    static int int_slocal = 0;
+    static char char_slocal = 'r';
+    static double float_slocal = 1.2;
+
+    if (trozos[1]==NULL || (strcmp(trozos[1], "-all")==0)){
+        blocks = true;
+        funcs = true;
+        vars = true;
+    }
+    else if (strcmp(trozos[1], "-blocks")==0){
+        blocks = true;
+    }
+    else if (strcmp(trozos[1], "-funcs")==0){
+        funcs = true;
+    }
+    else if (strcmp(trozos[1], "-vars")==0){
+        vars = true;
+    }
+    else if (strcmp(trozos[1], "-pmap")==0){
+        pmap = true;
+    }
+    else {
+        printf("%s no es una opción\n", trozos[1]);
+    }
+
+    if(vars){
+        printf("Variables locales\t%p,\t%p,\t%p\n", &int_local, &char_local, &float_local);
+        printf("Variables globales\t%p,\t%p,\t%p\n", &int_glocal, &char_glocal, &float_glocal);
+        //printf("Var (N.I) globales\t%p,\t%p,\t%p\n", );
+        printf("Variables estaticas\t%p,\t%p,\t%p\n", &int_slocal, &char_slocal, &float_slocal);
+        //printf("Var (N.I) estaticas\t%p,\t%p,\t%p\n", );
+    }
+    if(funcs){
+        printf("Funciones programa\t%p,\t%p,\t%p\n", &mallocCmd, &LlenarMemoria, &EscribirFichero);
+        printf("Funciones libreria\t%p,\t%p,\t%p\n", &printf, &calloc, &shmget);
+    }
+    if(blocks){
+        printf("******Lista de bloques asignados para el proceso %d\n", getpid());
+        list_print(null,M);
+    }
+    if (pmap){
+        Do_MemPmap();
+    }
+    vars = false;
+    funcs = false;
+    blocks = false;
+    pmap = false;
+}
+
+/*
+                |####################################################################################################|
+                |--------------------------------------DESDE AQUI TODO CORRECTO--------------------------------------|
+                |####################################################################################################|
+*/
+
 void FechaHora(time_t t, char *dest){
     struct tm *local_time = localtime(&t);
     char mesString[1024];
@@ -79,14 +143,16 @@ void list_print(tAllocType ref, tListM M){
 
             if(m.allocType==MALLOC){
                 strcpy(tipo,"malloc");
+                printf("      %p\t\t%d (%s) %s\n",m.direccion,(int)m.size,fecha,tipo);
             }
             else if(m.allocType==SHARED){
                 strcpy(tipo,"shared");
+                printf("      %p\t\t%d (%s) %s (key %d)\n",m.direccion,(int)m.size,fecha,tipo,m.Type.key);
             }
             else if(m.allocType==MMAP){
                 strcpy(tipo,"mmap");
+                printf("      %p\t\t%d (%s) %s (key %s)\n",m.direccion,(int)m.size,fecha,tipo,m.Type.file);
             }
-            printf("      %p\t\t%d (%s) %s\n",m.direccion,(int)m.size,fecha,tipo);
         }
     }
     else{
@@ -97,15 +163,61 @@ void list_print(tAllocType ref, tListM M){
             if(m.allocType==ref){
                 if(ref==MALLOC){
                     strcpy(tipo,"malloc");
+                    printf("      %p\t\t%d (%s) %s\n",m.direccion,(int)m.size,fecha,tipo);
                 }
                 else if(ref==SHARED){
                     strcpy(tipo,"shared");
+                    printf("      %p\t\t%d (%s) %s (key %d)\n",m.direccion,(int)m.size,fecha,tipo,m.Type.key);
                 }
                 else if(ref==MMAP){
                     strcpy(tipo,"mmap");
+                    printf("      %p\t\t%d (%s) %s (key %s)\n",m.direccion,(int)m.size,fecha,tipo,m.Type.file);
                 }
-                printf("      %p\t\t%d (%s) %s\n",m.direccion,(int)m.size,fecha,tipo);
             }
+        }
+    }
+}
+
+void mallocCmd(char **trozos, tListM *M){
+    tItemM m;
+
+    if(trozos[1]==NULL){
+        printf("******Lista de bloques asignados malloc para el proceso %d\n",getpid());
+        list_print(MALLOC,*M);
+    }
+    else if(strcmp(trozos[1],"-free")==0){
+        tPosM p;
+
+        //Libera a primeira que encontra, a mais antigua
+        p=findItemMallocM(atoi(trozos[2]),MALLOC,*M);
+        if(p==NULL){
+            printf("No hay bloque de ese tamano asignado con malloc\n");
+        }
+        else{
+            m=getItemM(p,*M);
+            free(m.direccion);
+            deleteAtPositionM(p, M);
+        }
+    }
+    else{
+        if(atoi(trozos[1])!=0){
+            if((m.direccion=calloc(atoi(trozos[1]),1))==NULL){
+                perror("Sin memoria");
+            }
+            else{
+                m.size=atoi(trozos[1]);
+                time(&m.allocTime);
+                m.allocType=MALLOC;
+                if(insertItemM(m,M)==false){
+                    printf("Imposible hacer malloc\n");
+                }
+                else{
+                    printf("Asignados %d bytes en %p\n",(int)m.size,m.direccion);
+                }
+            }
+        }
+        else{
+            printf("No se asignan bloques de 0 bytes\n");
         }
     }
 }
@@ -138,9 +250,10 @@ void * ObtenerMemoriaShmget (key_t clave, size_t tam,tListM *M)
     item.Type.key=clave;
     item.direccion=p;
     insertItemM(item, M);
-    
+
     return (p);
 }
+
 void SharedCreate (char *tr[],tListM *M)
 {
     key_t cl;
@@ -210,72 +323,31 @@ void shared (char **trozos, tListM *M){
 
         deleteAtPositionM(p,M);
     }
-    else{
-        //TODO Esto da error por algun motivo
-        struct shmid_ds s;;
-        if (shmctl(atoi(trozos[1]), IPC_STAT, &s) == -1) {
+    else{ //En caso de que solo queramos reservar memoria de una clave creada
+        struct shmid_ds s;
+
+        int shmid=shmget((key_t)atoi(trozos[1]),0,0);
+        if (shmid == -1) {
+            perror("shmget");
+            return;
+        }
+
+        if (shmctl(shmid, IPC_STAT, &s) == -1) {
             perror("shmctl info");
             return;
         }
 
         //Asignar memoria a partir de una clave
-        q=shmat(atoi(trozos[1]),NULL,0777);
+        q=shmat(shmid,NULL,0777);
 
         x.direccion=q;
         time(&x.allocTime);
         x.size=s.shm_segsz;
         x.allocType=SHARED;
         x.Type.key=atoi(trozos[1]);
+        insertItemM(x,M);
 
-        printf("Memoria compartida en clave %d en %p",atoi(trozos[1]),q);
-    }
-}
-/*
-                |####################################################################################################|
-                |--------------------------------------DESDE AQUI TODO CORRECTO--------------------------------------|
-                |####################################################################################################|
-*/
-void mallocCmd(char **trozos, tListM *M){
-    tItemM m;
-
-    if(trozos[1]==NULL){
-        printf("******Lista de bloques asignados malloc para el proceso %d\n",getpid());
-        list_print(MALLOC,*M);
-    }
-    else if(strcmp(trozos[1],"-free")==0){
-        tPosM p;
-
-        //Libera a primeira que encontra, a mais antigua
-        p=findItemMallocM(atoi(trozos[2]),MALLOC,*M);
-        if(p==NULL){
-            printf("No hay bloque de ese tamano asignado con malloc\n");
-        }
-        else{
-            m=getItemM(p,*M);
-            free(m.direccion);
-            deleteAtPositionM(p, M);
-        }
-    }
-    else{
-        if(atoi(trozos[1])!=0){
-            if((m.direccion=calloc(atoi(trozos[1]),1))==NULL){
-                perror("Sin memoria");
-            }
-            else{
-                m.size=atoi(trozos[1]);
-                time(&m.allocTime);
-                m.allocType=MALLOC;
-                if(insertItemM(m,M)==false){
-                    printf("Imposible hacer malloc\n");
-                }
-                else{
-                    printf("Asignados %d bytes en %p\n",(int)m.size,m.direccion);
-                }
-            }
-        }
-        else{
-            printf("No se asignan bloques de 0 bytes\n");
-        }
+        printf("Memoria compartida en clave %d en %p\n",atoi(trozos[1]),q);
     }
 }
 
@@ -536,64 +608,6 @@ void Do_MemPmap (void) /*sin argumentos*/
         exit(1);
     }
     waitpid (pid,NULL,0);
-}
-
-void mem(char **trozos, tListM M){ //TODO cambiar un pouco estructura pa evitar a copia
-    bool blocks = false, funcs = false, vars = false, pmap = false;
-
-    //Variables locales creadas
-    int int_local = 0;
-    char char_local = 'r';
-    double float_local = 1.2;
-
-    //Variables estáticas creadas
-    static int int_slocal = 0;
-    static char char_slocal = 'r';
-    static double float_slocal = 1.2;
-
-    if (trozos[1]==NULL || (strcmp(trozos[1], "-all")==0)){
-        blocks = true;
-        funcs = true;
-        vars = true;
-    }
-    else if (strcmp(trozos[1], "-blocks")==0){
-        blocks = true;
-    }
-    else if (strcmp(trozos[1], "-funcs")==0){
-        funcs = true;
-    }
-    else if (strcmp(trozos[1], "-vars")==0){
-        vars = true;
-    }
-    else if (strcmp(trozos[1], "-pmap")==0){
-        pmap = true;
-    }
-    else {
-        printf("%s no es una opción\n", trozos[1]);
-    }
-
-    if(vars){
-        printf("Variables locales\t%p,\t%p,\t%p\n", &int_local, &char_local, &float_local);
-        printf("Variables globales\t%p,\t%p,\t%p\n", &int_glocal, &char_glocal, &float_glocal);
-        //printf("Var (N.I) globales\t%p,\t%p,\t%p\n", );
-        printf("Variables estaticas\t%p,\t%p,\t%p\n", &int_slocal, &char_slocal, &float_slocal);
-        //printf("Var (N.I) estaticas\t%p,\t%p,\t%p\n", );
-    }
-    if(funcs){
-        printf("Funciones programa\t%p,\t%p,\t%p\n", &mallocCmd, &LlenarMemoria, &EscribirFichero);
-        printf("Funciones libreria\t%p,\t%p,\t%p\n", &printf, &calloc, &shmget);
-    }
-    if(blocks){
-        printf("******Lista de bloques asignados para el proceso %d\n", getpid());
-        list_print(null,M);
-    }
-    if (pmap){
-        Do_MemPmap();
-    }
-    vars = false;
-    funcs = false;
-    blocks = false;
-    pmap = false;
 }
 
 void Recursiva (int n){
