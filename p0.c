@@ -559,7 +559,7 @@ void insertarComandoHist(tListH *L, char *comando){
     insertItemH(p,L);
 }
 
-void freeMallocAsignedBlocks(tListM M){
+void freeAsignedBlocks(tListM M){
     tPosM p;
     tItemM q;
 
@@ -567,6 +567,12 @@ void freeMallocAsignedBlocks(tListM M){
         q=getItemM(p,M);
         if(q.allocType==MALLOC){
             free(q.direccion);
+        }
+        else if(q.allocType==SHARED){
+            shmdt(q.direccion);
+        }
+        else if(q.allocType==MMAP){
+            //Liberar mapeos a memoria
         }
     }
 }
@@ -607,7 +613,7 @@ int main(){
     //printf("Comando %s. argumento %s\n",comando,trozos[1]);
 
     //Liberar bloques de memoria asignados
-    freeMallocAsignedBlocks(M);
+    freeAsignedBlocks(M);
 
     listMemFree(&L);
     deleteListH(&H);

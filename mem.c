@@ -22,20 +22,15 @@ tItemM getItemM(tPosM pos, tListM L){
     return pos->data;
 }
 
-tPosM findItemMallocM(size_t tam, tAllocType allocType, tListM L) {
+tPosM findItemMallocM(size_t tam, tListM L) {
     tPosM p;
-    if(allocType!=MALLOC && allocType!=SHARED && allocType!=MMAP){ //Por si non queremos que sexa de un tipo en concreto
-        for(p = L;(p != NULL) && (p -> data.size != tam); p = p -> next);
-    }
-    else{
-        for(p = L;(p != NULL) && (p -> data.size != tam) && (p->data.allocType!=allocType); p = p -> next);
-    }
+    for(p = L;(p != NULL) && (p -> data.size != tam); p = p -> next);
     return p;
 }
 
-tPosM findItemSharedM(int key, tAllocType allocType, tListM L) {
-    tPosM p;
-    for(p = L;(p != NULL) && (p -> data.Type.key != key) && (p->data.allocType!=allocType); p = p -> next);
+tPosM findItemSharedM(int key, tListM L) {
+    tPosM p=NULL;
+    for(p = L;(p != NULL) && (p -> data.Type.key != key); p = p -> next);
     return p;
 }
 

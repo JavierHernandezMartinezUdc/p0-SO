@@ -2,68 +2,10 @@
 
 #define TAMANO 2048
 
-//VARIABLES GLOBALES CREADAS
-int int_glocal = 0;
-char char_glocal = 'r';
-double float_glocal = 1.2;
-
-void mem(char **trozos, tListM M){ //TODO cambiar un pouco estructura pa evitar a copia
-    bool blocks = false, funcs = false, vars = false, pmap = false;
-
-    //Variables locales creadas
-    int int_local = 0;
-    char char_local = 'r';
-    double float_local = 1.2;
-
-    //Variables estáticas creadas
-    static int int_slocal = 0;
-    static char char_slocal = 'r';
-    static double float_slocal = 1.2;
-
-    if (trozos[1]==NULL || (strcmp(trozos[1], "-all")==0)){
-        blocks = true;
-        funcs = true;
-        vars = true;
-    }
-    else if (strcmp(trozos[1], "-blocks")==0){
-        blocks = true;
-    }
-    else if (strcmp(trozos[1], "-funcs")==0){
-        funcs = true;
-    }
-    else if (strcmp(trozos[1], "-vars")==0){
-        vars = true;
-    }
-    else if (strcmp(trozos[1], "-pmap")==0){
-        pmap = true;
-    }
-    else {
-        printf("%s no es una opción\n", trozos[1]);
-    }
-
-    if(vars){
-        printf("Variables locales\t%p,\t%p,\t%p\n", &int_local, &char_local, &float_local);
-        printf("Variables globales\t%p,\t%p,\t%p\n", &int_glocal, &char_glocal, &float_glocal);
-        //printf("Var (N.I) globales\t%p,\t%p,\t%p\n", );
-        printf("Variables estaticas\t%p,\t%p,\t%p\n", &int_slocal, &char_slocal, &float_slocal);
-        //printf("Var (N.I) estaticas\t%p,\t%p,\t%p\n", );
-    }
-    if(funcs){
-        printf("Funciones programa\t%p,\t%p,\t%p\n", &mallocCmd, &LlenarMemoria, &EscribirFichero);
-        printf("Funciones libreria\t%p,\t%p,\t%p\n", &printf, &calloc, &shmget);
-    }
-    if(blocks){
-        printf("******Lista de bloques asignados para el proceso %d\n", getpid());
-        list_print(null,M);
-    }
-    if (pmap){
-        Do_MemPmap();
-    }
-    vars = false;
-    funcs = false;
-    blocks = false;
-    pmap = false;
-}
+//Variables globales
+int int_global = 3;
+char char_global = 'a';
+double float_global = 4.7;
 
 /*
                 |####################################################################################################|
@@ -133,7 +75,6 @@ void FechaHora(time_t t, char *dest){
 void list_print(tAllocType ref, tListM M){
     tPosM p;
     tItemM m;
-    char tipo[7];
     char fecha[13];
 
     if(ref==null){
@@ -142,16 +83,13 @@ void list_print(tAllocType ref, tListM M){
             FechaHora(m.allocTime,fecha);
 
             if(m.allocType==MALLOC){
-                strcpy(tipo,"malloc");
-                printf("      %p\t\t%d (%s) %s\n",m.direccion,(int)m.size,fecha,tipo);
+                printf("      %p\t\t%d %s malloc\n",m.direccion,(int)m.size,fecha);
             }
             else if(m.allocType==SHARED){
-                strcpy(tipo,"shared");
-                printf("      %p\t\t%d (%s) %s (key %d)\n",m.direccion,(int)m.size,fecha,tipo,m.Type.key);
+                printf("      %p\t\t%d %s shared (key %d)\n",m.direccion,(int)m.size,fecha,m.Type.key);
             }
             else if(m.allocType==MMAP){
-                strcpy(tipo,"mmap");
-                printf("      %p\t\t%d (%s) %s (key %s)\n",m.direccion,(int)m.size,fecha,tipo,m.Type.file);
+                printf("      %p\t\t%d %s mmap (descriptor %d)\n",m.direccion,(int)m.size,fecha,m.Type.file.df);
             }
         }
     }
@@ -162,16 +100,13 @@ void list_print(tAllocType ref, tListM M){
 
             if(m.allocType==ref){
                 if(ref==MALLOC){
-                    strcpy(tipo,"malloc");
-                    printf("      %p\t\t%d (%s) %s\n",m.direccion,(int)m.size,fecha,tipo);
+                    printf("      %p\t\t%d %s malloc\n",m.direccion,(int)m.size,fecha);
                 }
                 else if(ref==SHARED){
-                    strcpy(tipo,"shared");
-                    printf("      %p\t\t%d (%s) %s (key %d)\n",m.direccion,(int)m.size,fecha,tipo,m.Type.key);
+                    printf("      %p\t\t%d %s shared (key %d)\n",m.direccion,(int)m.size,fecha,m.Type.key);
                 }
                 else if(ref==MMAP){
-                    strcpy(tipo,"mmap");
-                    printf("      %p\t\t%d (%s) %s (key %s)\n",m.direccion,(int)m.size,fecha,tipo,m.Type.file);
+                    printf("      %p\t\t%d %s mmap (descriptor %d)\n",m.direccion,(int)m.size,fecha,m.Type.file.df);
                 }
             }
         }
@@ -189,7 +124,7 @@ void mallocCmd(char **trozos, tListM *M){
         tPosM p;
 
         //Libera a primeira que encontra, a mais antigua
-        p=findItemMallocM(atoi(trozos[2]),MALLOC,*M);
+        p=findItemMallocM(atoi(trozos[2]),*M);
         if(p==NULL){
             printf("No hay bloque de ese tamano asignado con malloc\n");
         }
@@ -308,7 +243,7 @@ void shared (char **trozos, tListM *M){
         SharedCreate(trozos,M);}
     else if (strcmp(trozos[1], "-delkey") == 0) {SharedDelkey(trozos);}
     else if (strcmp(trozos[1], "-free") == 0) {
-        p=findItemSharedM(atoi(trozos[2]), SHARED, *M);
+        p=findItemSharedM(atoi(trozos[2]), *M);
 
         if(p==NULL){
             printf("No hay bloque de esa clave mapeado en el proceso\n");
@@ -316,6 +251,7 @@ void shared (char **trozos, tListM *M){
         }
 
         x=getItemM(p,*M);
+
         if (shmdt(x.direccion) == -1) {
             perror("shmdt");
             exit(EXIT_FAILURE);
@@ -608,6 +544,60 @@ void Do_MemPmap (void) /*sin argumentos*/
         exit(1);
     }
     waitpid (pid,NULL,0);
+}
+
+void mem(char **trozos, tListM M){ //TODO cambiar un pouco estructura pa evitar a copia
+    bool blocks = false, funcs = false, vars = false, pmap = false;
+
+    //Variables locales
+    int int_local = 3;
+    char char_local = 'a';
+    double float_local = 4.7;
+
+    //Variables estaticas
+    static int int_static = 3;
+    static char char_static = 'a';
+    static double float_static = 4.7;
+
+    if (trozos[1]==NULL || (strcmp(trozos[1], "-all")==0)){
+        blocks = true;
+        funcs = true;
+        vars = true;
+    }
+    else if (strcmp(trozos[1], "-blocks")==0){
+        blocks = true;
+    }
+    else if (strcmp(trozos[1], "-funcs")==0){
+        funcs = true;
+    }
+    else if (strcmp(trozos[1], "-vars")==0){
+        vars = true;
+    }
+    else if (strcmp(trozos[1], "-pmap")==0){
+        pmap = true;
+    }
+    else {
+        printf("%s no es una opción\n", trozos[1]);
+    }
+
+    if(vars){
+        printf("Variables locales\t%p,\t%p,\t%p\n", &int_local, &char_local, &float_local);
+        printf("Variables globales\t%p,\t%p,\t%p\n", &int_global, &char_global, &float_global);
+        //printf("Var (N.I) globales\t%p,\t%p,\t%p\n", );
+        printf("Variables estaticas\t%p,\t%p,\t%p\n", &int_static, &char_static, &float_static);
+        //printf("Var (N.I) estaticas\t%p,\t%p,\t%p\n", );
+    }
+    if(funcs){
+        printf("Funciones programa\t%p,\t%p,\t%p\n", &mallocCmd, &LlenarMemoria, &EscribirFichero);
+        printf("Funciones libreria\t%p,\t%p,\t%p\n", &printf, &calloc, &shmget);
+    }
+    if(blocks){
+        printf("******Lista de bloques asignados para el proceso %d\n", getpid());
+        list_print(null,M);
+    }
+    if (pmap){
+        Do_MemPmap();
+    }
 }
 
 void Recursiva (int n){
