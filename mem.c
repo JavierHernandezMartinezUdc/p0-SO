@@ -34,6 +34,12 @@ tPosM findItemSharedM(int key, tListM L) {
     return p;
 }
 
+tPosM findItemMmapM(char *nombre, tListM L){
+    tPosM p=NULL;
+    for(p = L;(p != NULL) && (strcmp(p->data.Type.file.nombre,nombre)!=0); p = p -> next);
+    return p;
+}
+
 void deleteAtPositionM(tPosM pos, tListM *L){
     tPosM q;
 

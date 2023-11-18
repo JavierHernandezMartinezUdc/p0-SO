@@ -254,7 +254,7 @@ void shared (char **trozos, tListM *M){
 
         if (shmdt(x.direccion) == -1) {
             perror("shmdt");
-            exit(EXIT_FAILURE);
+            return;
         }
 
         deleteAtPositionM(p,M);
@@ -285,6 +285,81 @@ void shared (char **trozos, tListM *M){
 
         printf("Memoria compartida en clave %d en %p\n",atoi(trozos[1]),q);
     }
+}
+
+void * MapearFichero (char * fichero, int protection, tListM *M)
+{
+    int df, map=MAP_PRIVATE,modo=O_RDONLY;
+    struct stat s;
+    void *p;
+    tItemM m;
+
+    if (protection&PROT_WRITE)
+          modo=O_RDWR;
+    if (stat(fichero,&s)==-1 || (df=open(fichero, modo))==-1)
+          return NULL;
+    if ((p=mmap (NULL,s.st_size, protection,map,df,0))==MAP_FAILED)
+           return NULL;
+
+    m.direccion=p;
+    time(&m.allocTime);
+    m.allocType=MMAP;
+    m.size=s.st_size;
+    m.Type.file.df=df;
+    strcpy(m.Type.file.nombre,fichero);
+
+    insertItemM(m,M);
+
+    return p;
+}
+
+void desmapear(char *fichero, tListM *M){
+    tPosM p;
+    tItemM m;
+    
+    p=findItemMmapM(fichero,*M);
+    if(p==NULL){
+        printf("No existe\n");
+        return;
+    }
+
+    m=getItemM(p,*M);
+    if(munmap(m.direccion,m.size)==-1){
+        perror("Error de desmapeo");
+        return;
+    }
+    
+    deleteAtPositionM(p,M);
+}
+
+void CmdMmap(char *arg[], tListM *M)
+{ 
+     char *perm;
+     void *p;
+     int protection=0;
+     
+     if (arg[1]==NULL)
+            {list_print(MMAP,*M); return;}
+     if (strcmp(arg[1],"-free")==0){
+            if(arg[2]==NULL){
+                list_print(MMAP,*M);
+                return;
+            }
+            else{
+                //desmapear fichero de memoria
+                desmapear(arg[2],M);
+                return;
+            }
+        }
+     if ((perm=arg[2])!=NULL && strlen(perm)<4) {
+            if (strchr(perm,'r')!=NULL) protection|=PROT_READ;
+            if (strchr(perm,'w')!=NULL) protection|=PROT_WRITE;
+            if (strchr(perm,'x')!=NULL) protection|=PROT_EXEC;
+     }
+     if ((p=MapearFichero(arg[1],protection, M))==NULL)
+             perror ("Imposible mapear fichero");
+     else
+             printf ("fichero %s mapeado en %p\n", arg[1], p);
 }
 
 ssize_t LeerFichero (char *f, void *p, size_t cont)

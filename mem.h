@@ -36,6 +36,7 @@ tPosM lastM(tListM L);
 tItemM getItemM(tPosM pos, tListM L);
 tPosM findItemMallocM(size_t tam, tListM L);
 tPosM findItemSharedM(int key, tListM L);
+tPosM findItemMmapM(char *nombre, tListM L);
 void deleteAtPositionM(tPosM pos, tListM *L);
 void deleteListM(tListM *L);
 bool insertItemM(tItemM d, tListM *L);
