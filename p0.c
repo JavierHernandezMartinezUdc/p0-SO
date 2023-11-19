@@ -572,7 +572,7 @@ void freeAsignedBlocks(tListM M){
             shmdt(q.direccion);
         }
         else if(q.allocType==MMAP){
-            //Liberar mapeos a memoria
+            munmap(q.direccion,q.size);
         }
     }
 }
