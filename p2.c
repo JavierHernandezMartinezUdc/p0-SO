@@ -339,9 +339,10 @@ void CmdMmap(char *arg[], tListM *M)
      int protection=0;
      
      if (arg[1]==NULL)
-            {list_print(MMAP,*M); return;}
+            {printf("******Lista de bloques asignados mmap para el proceso %d\n",getpid());list_print(MMAP,*M); return;}
      if (strcmp(arg[1],"-free")==0){
             if(arg[2]==NULL){
+                printf("******Lista de bloques asignados mmap para el proceso %d\n",getpid());
                 list_print(MMAP,*M);
                 return;
             }
@@ -526,7 +527,6 @@ void memDump(void *address, size_t size){
                 else{
                     printf("  %02X",ptr[j]);
                 }
-                //printf("  %02X",ptr[j]);
             }
             printf("\n");
             veces=0;
@@ -537,9 +537,9 @@ void memDump(void *address, size_t size){
 void memDumpCmd(char **trozos){
     void *p;
 
-    p=(void *)strtol(trozos[1],NULL,16);
-
     if(trozos[1]!=NULL){
+        p=(void *)strtol(trozos[1],NULL,16);
+
         if(trozos[2]==NULL){
             memDump(p,25);
         }
@@ -621,7 +621,7 @@ void Do_MemPmap (void) /*sin argumentos*/
     waitpid (pid,NULL,0);
 }
 
-void mem(char **trozos, tListM M){ //TODO cambiar un pouco estructura pa evitar a copia
+void mem(char **trozos, tListM M){
     bool blocks = false, funcs = false, vars = false, pmap = false;
 
     //Variables locales

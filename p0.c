@@ -392,7 +392,7 @@ void help(char *trozos[]) {
             printf("delete [name1 name2 ...]        Borra ficheros o directorios vacios\n"); //2 tabulados
         } else if (strcmp(trozos[1], "deltree") == 0) {
             printf("deltree [name1 name2 ...]       Borra ficheros o directorios no vacios recursivamente\n"); //2 tabulados
-        } else if(strcmp(trozos[1], "malloc") == 0){ //TODO completar novos comandos
+        } else if(strcmp(trozos[1], "malloc") == 0){
             printf("malloc [-free] [tam]    asigna un bloque memoria de tamano tam con malloc\n        -free: desasigna un bloque de memoria de tamano tam asignado con malloc\n");
         } else if(strcmp(trozos[1], "shared") == 0){
             printf("shared [-free|-create|-delkey] cl [tam] asigna memoria compartida con clave cl en el programa\n        -create cl tam: asigna (creando) el bloque de memoria compartida de clave cl y tamano tam\n        -free cl: desmapea el bloque de memoria compartida de clave cl\n        -delkey clelimina del sistema (sin desmapear) la clave de memoria cl\n");
