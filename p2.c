@@ -7,6 +7,10 @@ int int_global = 3;
 char char_global = 'a';
 double float_global = 4.7;
 
+int int_global_NI;
+char char_global_NI;
+double float_global_NI;
+
 /*
                 |####################################################################################################|
                 |--------------------------------------DESDE AQUI TODO CORRECTO--------------------------------------|
@@ -634,6 +638,10 @@ void mem(char **trozos, tListM M){
     static char char_static = 'a';
     static double float_static = 4.7;
 
+    static int int_static_NI;
+    static char char_static_NI;
+    static double float_static_NI;
+
     if (trozos[1]==NULL || (strcmp(trozos[1], "-all")==0)){
         blocks = true;
         funcs = true;
@@ -656,15 +664,15 @@ void mem(char **trozos, tListM M){
     }
 
     if(vars){
-        printf("Variables locales\t%p,\t%p,\t%p\n", &int_local, &char_local, &float_local);
-        printf("Variables globales\t%p,\t%p,\t%p\n", &int_global, &char_global, &float_global);
-        //printf("Var (N.I) globales\t%p,\t%p,\t%p\n", );
-        printf("Variables estaticas\t%p,\t%p,\t%p\n", &int_static, &char_static, &float_static);
-        //printf("Var (N.I) estaticas\t%p,\t%p,\t%p\n", );
+        printf("Variables locales\t%p,\t\t%p,\t\t%p\n", &int_local, &char_local, &float_local);
+        printf("Variables globales\t%p,\t\t%p,\t\t%p\n", &int_global, &char_global, &float_global);
+        printf("Var (N.I) globales\t%p,\t\t%p,\t\t%p\n", &int_global_NI, &char_global_NI, &float_global_NI);
+        printf("Variables estaticas\t%p,\t\t%p,\t\t%p\n", &int_static, &char_static, &float_static);
+        printf("Var (N.I) estaticas\t%p,\t\t%p,\t\t%p\n", &int_static_NI, &char_static_NI, &float_static_NI);
     }
     if(funcs){
-        printf("Funciones programa\t%p,\t%p,\t%p\n", &mallocCmd, &LlenarMemoria, &EscribirFichero);
-        printf("Funciones libreria\t%p,\t%p,\t%p\n", &printf, &calloc, &shmget);
+        printf("Funciones programa\t%p,\t\t%p,\t\t%p\n", &mallocCmd, &LlenarMemoria, &EscribirFichero);
+        printf("Funciones libreria\t%p,\t\t%p,\t\t%p\n", &printf, &calloc, &shmget);
     }
     if(blocks){
         printf("******Lista de bloques asignados para el proceso %d\n", getpid());
