@@ -332,6 +332,15 @@ void help(char *trozos[]) {
         printf("list\n");
         printf("delete\n");
         printf("deltree\n");
+        printf("malloc\n");
+        printf("shared\n");
+        printf("mmap\n");
+        printf("read\n");
+        printf("write\n");
+        printf("memdup\n");
+        printf("memfill\n");
+        printf("mem\n");
+        printf("recurse\n");
     } else {
         //Si se llama con un argumento muestra una breve descripcion del comando
         if (strcmp(trozos[1], "authors") == 0) {
@@ -384,23 +393,23 @@ void help(char *trozos[]) {
         } else if (strcmp(trozos[1], "deltree") == 0) {
             printf("deltree [name1 name2 ...]       Borra ficheros o directorios no vacios recursivamente\n"); //2 tabulados
         } else if(strcmp(trozos[1], "malloc") == 0){ //TODO completar novos comandos
-            printf("");
+            printf("malloc [-free] [tam]    asigna un bloque memoria de tamano tam con malloc\n        -free: desasigna un bloque de memoria de tamano tam asignado con malloc\n");
         } else if(strcmp(trozos[1], "shared") == 0){
-            printf("");
+            printf("shared [-free|-create|-delkey] cl [tam] asigna memoria compartida con clave cl en el programa\n        -create cl tam: asigna (creando) el bloque de memoria compartida de clave cl y tamano tam\n        -free cl: desmapea el bloque de memoria compartida de clave cl\n        -delkey clelimina del sistema (sin desmapear) la clave de memoria cl\n");
         } else if(strcmp(trozos[1], "mmap") == 0){
-            printf("");
+            printf("mmap [-free] fich prm   mapea el fichero fich con permisos prm\n        -free fich: desmapea el ficherofich");
         } else if(strcmp(trozos[1], "read") == 0){
-            printf("");
+            printf("read fiche addr cont    Lee cont bytes desde fich a la direccion addr\n");
         } else if(strcmp(trozos[1], "write") == 0){
-            printf("");
+            printf("write [-o] fiche addr cont      Escribe cont bytes desde la direccion addr a fich (-o sobreescribe)\n");
         } else if(strcmp(trozos[1], "memdump") == 0){
-            printf("");
+            printf("memdump addr cont       Vuelca en pantallas los contenidos (cont bytes) de la posicion de memoria addr\n");
         } else if(strcmp(trozos[1], "memfill") == 0){
-            printf("");
+            printf("memfill addr cont byte  Llena la memoria a partir de addr con byte\n");
         } else if(strcmp(trozos[1], "mem") == 0){
-            printf("");
+            printf("mem [-blocks|-funcs|-vars|-all|-pmap] ..        Muestra muestra detalles de la memoria del proceso\n        -blocks: los bloques de memoria asignados\n        -funcs: las direcciones de las funciones\n        -vars: las direcciones de las variables\n        :-all: todo\n        -pmap: muestra la salida del comando pmap(o similar)\n");
         } else if(strcmp(trozos[1], "recurse") == 0){
-            printf("");
+            printf("recurse [n]     Invoca a la funcion recursiva n veces\n");
         } else {
             printf("%s no encontrado\n", trozos[1]);
         }
