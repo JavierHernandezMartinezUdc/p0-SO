@@ -383,7 +383,7 @@ void help(char *trozos[]) {
         } else if (strcmp(trozos[1], "bye") == 0) {
             printf("bye: Termina la shell\n");
         } else if (strcmp(trozos[1], "create") == 0) {
-            printf("create [-f] [name]      Crea un directorio o fichero (-f)"); //2 tabulados
+            printf("create [-f] [name]      Crea un directorio o fichero (-f)\n"); //2 tabulados
         } else if (strcmp(trozos[1], "stat") == 0) {
             printf("stat [-long] [-link] [-acc] name1 name2 ...     lista ficheros;\n      -long: listado largo\n      -acc: accesstime\n      -link: si es enlace simbolico, el path contenido\n"); //2 tabulados
         } else if (strcmp(trozos[1], "list") == 0) {
@@ -397,7 +397,7 @@ void help(char *trozos[]) {
         } else if(strcmp(trozos[1], "shared") == 0){
             printf("shared [-free|-create|-delkey] cl [tam] asigna memoria compartida con clave cl en el programa\n        -create cl tam: asigna (creando) el bloque de memoria compartida de clave cl y tamano tam\n        -free cl: desmapea el bloque de memoria compartida de clave cl\n        -delkey clelimina del sistema (sin desmapear) la clave de memoria cl\n");
         } else if(strcmp(trozos[1], "mmap") == 0){
-            printf("mmap [-free] fich prm   mapea el fichero fich con permisos prm\n        -free fich: desmapea el ficherofich");
+            printf("mmap [-free] fich prm   mapea el fichero fich con permisos prm\n        -free fich: desmapea el fichero fich\n");
         } else if(strcmp(trozos[1], "read") == 0){
             printf("read fiche addr cont    Lee cont bytes desde fich a la direccion addr\n");
         } else if(strcmp(trozos[1], "write") == 0){
