@@ -18,6 +18,8 @@ paula.carril@udc.es
 #include "p2.h"
 #include "p3.h"
 
+extern char **environ;
+
 void comandN(int numWords, char *trozos[], tListH *H, bool *terminado, tListF *L, tListM *M);
 /*
 //En trozos[0] gardase o comando e a partir de trozos[1] os argumentos
@@ -553,7 +555,7 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             //uid;
             break;
         case 31:
-            showvar(trozos);
+            showvar(trozos,envp,environ);
             break;
         case 32:
             break;
