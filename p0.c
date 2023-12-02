@@ -16,6 +16,7 @@ paula.carril@udc.es
 #include "historic.h"
 #include "p1.h"
 #include "p2.h"
+#include "p3.h"
 
 void comandN(int numWords, char *trozos[], tListH *H, bool *terminado, tListF *L, tListM *M);
 /*
@@ -42,10 +43,10 @@ void leerComando(char *comando){
 
 int elegirComando(char *comando){
     int i;
-    char *comandosDisponibles[30]={"authors","pid","chdir","date","time","hist","command","open","close","dup","listopen","infosys","help","bye","exit","quit","create","stat","list","delete","deltree","malloc","shared","mmap","read","write","memdump","memfill","mem","recurse"};
-    //30 de tamaño porque se el numero de comandos que hay. Aumentaran en practicas consecutivas
+    char *comandosDisponibles[40]={"authors","pid","chdir","date","time","hist","command","open","close","dup","listopen","infosys","help","bye","exit","quit","create","stat","list","delete","deltree","malloc","shared","mmap","read","write","memdump","memfill","mem","recurse","uid","showvar","changevar","subsvar","showenv","fork","exec","jobs","deljobs","job"};
+    //40 de tamaño porque se el numero de comandos que hay. Aumentaran en practicas consecutivas
 
-    for(i=0;i<30;i++){ //Cambiar segun tamaño array
+    for(i=0;i<40;i++){ //Cambiar segun tamaño array
         if(strcmp(comando,comandosDisponibles[i])==0){
             return i;
         }
@@ -341,6 +342,16 @@ void help(char *trozos[]) {
         printf("memfill\n");
         printf("mem\n");
         printf("recurse\n");
+        printf("uid\n");
+        printf("showvar\n");
+        printf("changevar\n");
+        printf("subsvar\n");
+        printf("showenv\n");
+        printf("fork\n");
+        printf("exec\n");
+        printf("jobs\n");
+        printf("deljobs\n");
+        printf("job\n");
     } else {
         //Si se llama con un argumento muestra una breve descripcion del comando
         if (strcmp(trozos[1], "authors") == 0) {
@@ -408,8 +419,26 @@ void help(char *trozos[]) {
             printf("memfill addr cont byte  Llena la memoria a partir de addr con byte\n");
         } else if(strcmp(trozos[1], "mem") == 0){
             printf("mem [-blocks|-funcs|-vars|-all|-pmap] ..        Muestra muestra detalles de la memoria del proceso\n        -blocks: los bloques de memoria asignados\n        -funcs: las direcciones de las funciones\n        -vars: las direcciones de las variables\n        :-all: todo\n        -pmap: muestra la salida del comando pmap(o similar)\n");
-        } else if(strcmp(trozos[1], "recurse") == 0){
+        } else if(strcmp(trozos[1], "recurse") == 0) {
             printf("recurse [n]     Invoca a la funcion recursiva n veces\n");
+        } else if(strcmp(trozos[1],"uid") == 0) {
+            printf("uid [-get|-set] [-l] [id]        Accede a las credenciales del proceso que ejecuta el shell\n        -get: muestra las credenciales\n        -set id: establece la credencial al valor numerico id\n        -set -l id: establece la credencial a login id\n");
+        } else if(strcmp(trozos[1],"showvar") == 0) {
+            printf("showvar var     Muestra el valor y las direcciones de la variable de entorno var\n");
+        } else if(strcmp(trozos[1],"changevar") == 0) {
+            printf("changevar [-a|-e|-p] var valor  Cambia el valor de una variable de entorno\n        -a: accede por el tercer arg de main\n        -e: accede mediante environ\n        -p: accede mediante putenv\n");
+        } else if(strcmp(trozos[1],"subsvar") == 0) {
+            printf("subsvar [-a|-e] var1 var2 valor Sustituye la variable de entorno var1\n        con var2=valor\n        -a: accede por el tercer arg de main\n        -e: accede mediante environ\n");
+        } else if(strcmp(trozos[1],"showenv") == 0) {
+            printf("showenv [-environ|-addr]         Muestra el entorno del proceso\n        -environ: accede usando environ (en lugar del tercer arg de main)\n        -addr: muestra el valor y donde se almacenan environ y el 3er arg main\n");
+        } else if(strcmp(trozos[1],"fork") == 0) {
+            printf("fork    El shell hace fork y queda en espera a que su hijo termine\n");
+        } else if(strcmp(trozos[1],"jobs") == 0) {
+            printf("jobs    Lista los procesos en segundo plano\n");
+        } else if(strcmp(trozos[1],"deljobs") == 0) {
+            printf("deljobs [-term][-sig]   Elimina los procesos de la lista procesos en sp\n        -term: los terminados\n        -sig: los terminados por senal\n");
+        } else if(strcmp(trozos[1],"job") == 0) {
+            printf("job [-fg] pid   Muestra informacion del proceso pid.\n                -fg: lo pasa a primer plano\n");
         } else {
             printf("%s no encontrado\n", trozos[1]);
         }
@@ -519,7 +548,29 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             break;
         case 29:
             Recursiva(atoi(trozos[1]));
-            break;            
+            break;
+        case 30:
+            //uid;
+            break;
+        case 31:
+            showvar(trozos);
+            break;
+        case 32:
+            break;
+        case 33:
+            break;
+        case 34:
+            break;
+        case 35:
+            break;
+        case 36:
+            break;
+        case 37:
+            break;
+        case 38:
+            break;
+        case 39:
+            break;
         default:
             printf("No ejecutado: No such file or directory\n");
             break;
