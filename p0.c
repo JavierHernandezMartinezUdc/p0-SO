@@ -661,7 +661,7 @@ int main(){
             //Formato para hist
             strcpy(comandoCompleto,comando);
             strtok(comandoCompleto,"\n");
-            //Formato para hist
+            //FIN Formato para hist
             numWords=TrocearCadena(comando, trozos);
             eleccionComando=elegirComando(trozos[0]);
             insertarComandoHist(&H, comandoCompleto);

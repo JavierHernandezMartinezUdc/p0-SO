@@ -29,7 +29,7 @@ void Cmd_fork (char *tr[])
 int BuscarVariable (char * var, char *e[])  /*busca una variable en el entorno que se le pasa como parámetro*/
 {
     int pos=0;
-    char aux[MAXVAR];
+    char aux[1024];
 
     strcpy (aux,var);
     strcat (aux,"=");
