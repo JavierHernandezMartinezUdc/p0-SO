@@ -74,7 +74,7 @@ int CambiarVariable(char * var, char * valor, char *e[]) /*cambia una variable e
    
   if ((pos=BuscarVariable(var,e))==-1)
     return(-1);
- 
+
   if ((aux=(char *)malloc(strlen(var)+strlen(valor)+2))==NULL)
 	return -1;
   strcpy(aux,var);
@@ -134,35 +134,6 @@ void changevar(char **trozos, char **arg3){
     }
 }
 
-/*
-bool eliminarVar(char *var, char *e[]){
-    bool found;
-    int index;
-
-    while (*e) {
-        if (strstr(*e, var) == *e) {
-            found = true;
-            break;
-        }
-
-        e++;
-        index++;
-    }
-
-    if(found){
-        while (e[index + 1] != NULL) {
-            e[index] = e[index + 1];
-            index++;
-        }
-        e[index] = NULL;
-        return true;
-    }
-    else{
-        return false;
-    }
-}
-*/
-
 int CambiarNombre(char * viejo, char * nuevo, char * valor, char *e[]) /*cambia una variable en el entorno que se le pasa como parÃ¡metro*/
 {                                                        /*lo hace directamente, no usa putenv*/
   int pos;
@@ -212,6 +183,27 @@ void subsvar(char **trozos, char **arg3){
         else{
             printf("Uso: subsvar [-a|-e] var1 var2 valor\n");
         }
+    }
+}
+
+void showenv(char **trozos, char **arg3){
+    if(trozos[1]==NULL){
+        int i=0;
+        for(char **env = arg3; *env != NULL; env++){
+            printf("%p->main arg3[%d]=(%p) %s\n",(void *)env,i,(void *)*env,*env);
+            i++;
+        }
+    }
+    else if(strcmp(trozos[1],"-environ")==0){
+        int i=0;
+        for(char **env = environ; *env != NULL; env++){
+            printf("%p->environ[%d]=(%p) %s\n",(void *)env,i,(void *)*env,*env);
+            i++;
+        }
+    }
+    else if(strcmp(trozos[1],"-addr")==0){
+        printf("environ: %p (almacenado en %p)\n",(void *)environ[0],(void *)environ);
+        printf("main arg3: %p (almacenado en %p)\n",(void *)environ[0],(void *)arg3);
     }
 }
 

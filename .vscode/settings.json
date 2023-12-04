@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "librerias.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "proc.h": "c"
     }
 }

@@ -564,6 +564,7 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             subsvar(trozos,arg3);
             break;
         case 34:
+            showenv(trozos, arg3);
             break;
         case 35:
             Cmd_fork(P);
@@ -654,13 +655,11 @@ int main(int argc, char *argv[], char **arg3){
     tListP P;
 
     createEmptyListF(&L);
-    insertarESstd(&L);
-
     createEmptyListH(&H);
-
     createEmptyListM(&M);
-
     createEmptyListP(&P);
+
+    insertarESstd(&L);
 
     while(!terminado){
         imprimirPrompt();
