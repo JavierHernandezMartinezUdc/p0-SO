@@ -82,8 +82,8 @@ void uid(char **trozos){
     euid = geteuid();
 
     if (trozos[1]== 0 || strcmp(trozos[1],"-get")==1) {
-        printf("ID de usuario real: %d, (%s)\n", ruid);
-        printf("ID de usuario efectivo: %d, (%s)\n", euid);
+        printf("ID de usuario real: %d, (%s)\n", ruid, getpwuid(ruid)->pw_name);
+        printf("ID de usuario efectivo: %d, (%s)\n", euid, getpwuid(euid)->pw_name);
     } else if(strcmp(trozos[1],"-set")==0){
         if (strcmp(trozos[2],"-l")==0){
             //login
