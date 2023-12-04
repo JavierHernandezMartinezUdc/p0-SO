@@ -73,3 +73,22 @@ void showvar(char **trozos){
         }
     }
 }
+
+void uid(char **trozos){
+    uid_t ruid, euid;
+    //gid_t rgid, egid;
+
+    ruid = getuid();
+    euid = geteuid();
+
+    if (trozos[1]== 0 || strcmp(trozos[1],"-get")==1) {
+        printf("ID de usuario real: %d, (%s)\n", ruid);
+        printf("ID de usuario efectivo: %d, (%s)\n", euid);
+    } else if(strcmp(trozos[1],"-set")==0){
+        if (strcmp(trozos[2],"-l")==0){
+            //login
+        }else{
+            //numero (id)
+        }
+    }
+}
