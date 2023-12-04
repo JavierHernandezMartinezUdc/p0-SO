@@ -561,10 +561,12 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             changevar(trozos,arg3);
             break;
         case 33:
+            subsvar(trozos,arg3);
             break;
         case 34:
             break;
         case 35:
+            Cmd_fork(P);
             break;
         case 36:
             break;

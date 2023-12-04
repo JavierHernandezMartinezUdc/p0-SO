@@ -50,29 +50,71 @@ void showvar(char **trozos, char **arg3){
     }
 }
 
+int BuscarVariable (char * var, char *e[])  /*busca una variable en el entorno que se le pasa como parÃ¡metro*/
+{
+  int pos=0;
+  char aux[1024];
+  
+  strcpy (aux,var);
+  strcat (aux,"=");
+  
+  while (e[pos]!=NULL)
+    if (!strncmp(e[pos],aux,strlen(aux)))
+      return (pos);
+    else 
+      pos++;
+  errno=ENOENT;   /*no hay tal variable*/
+  return(-1);
+}
+
+int CambiarVariable(char * var, char * valor, char *e[]) /*cambia una variable en el entorno que se le pasa como parÃ¡metro*/
+{                                                        /*lo hace directamente, no usa putenv*/
+  int pos;
+  char *aux;
+   
+  if ((pos=BuscarVariable(var,e))==-1)
+    return(-1);
+ 
+  if ((aux=(char *)malloc(strlen(var)+strlen(valor)+2))==NULL)
+	return -1;
+  strcpy(aux,var);
+  strcat(aux,"=");
+  strcat(aux,valor);
+  e[pos]=aux;
+  return (pos);
+}
+
 void changevar(char **trozos, char **arg3){
     if(trozos[1]==NULL || trozos[2]==NULL){
         printf("Uso: changevar [-a|-e|-p] var valor\n");
     }
     else{
         if(strcmp(trozos[1],"-a")==0){
-            if(trozos[2]==NULL || trozos[3]==NULL){
+            if(trozos[3]==NULL){
                 printf("Uso: changevar [-a|-e|-p] var valor\n");
             }
             else{
                 //Modificar valor en arg3
+                int result=CambiarVariable(trozos[2],trozos[3],arg3);
+                if(result==-1){
+                    perror("Imposible cambiar variable");
+                }
             }
         }
         else if(strcmp(trozos[1],"-e")==0){
-            if(trozos[2]==NULL || trozos[3]==NULL){
+            if(trozos[3]==NULL){
                 printf("Uso: changevar [-a|-e|-p] var valor\n");
             }
             else{
                 //Modificar valor usando environ
+                int result=CambiarVariable(trozos[2],trozos[3],environ);
+                if(result==-1){
+                    perror("Imposible cambiar variable");
+                }
             }
         }
         else if(strcmp(trozos[1],"-p")==0){
-            if(trozos[2]==NULL || trozos[3]==NULL){
+            if(trozos[3]==NULL){
                 printf("Uso: changevar [-a|-e|-p] var valor\n");
             }
             else{
@@ -90,4 +132,97 @@ void changevar(char **trozos, char **arg3){
             printf("Uso: changevar [-a|-e|-p] var valor\n");
         }
     }
+}
+
+/*
+bool eliminarVar(char *var, char *e[]){
+    bool found;
+    int index;
+
+    while (*e) {
+        if (strstr(*e, var) == *e) {
+            found = true;
+            break;
+        }
+
+        e++;
+        index++;
+    }
+
+    if(found){
+        while (e[index + 1] != NULL) {
+            e[index] = e[index + 1];
+            index++;
+        }
+        e[index] = NULL;
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+*/
+
+int CambiarNombre(char * viejo, char * nuevo, char * valor, char *e[]) /*cambia una variable en el entorno que se le pasa como parÃ¡metro*/
+{                                                        /*lo hace directamente, no usa putenv*/
+  int pos;
+  char *aux;
+   
+  if ((pos=BuscarVariable(viejo,e))==-1)
+    return(-1);
+ 
+  if ((aux=(char *)malloc(strlen(valor)+strlen(nuevo)+2))==NULL)
+	return -1;
+  strcpy(aux,nuevo);
+  strcat(aux,"=");
+  strcat(aux,valor);
+  e[pos]=aux;
+  return (pos);
+}
+
+void subsvar(char **trozos, char **arg3){
+    if(trozos[1]==NULL || trozos[2]==NULL){
+        printf("Uso: subsvar [-a|-e] var1 var2 valor\n");
+    }
+    else{
+        if(strcmp(trozos[1],"-a")==0){
+            if(trozos[3]==NULL || trozos[4]==NULL){
+                printf("Uso: subsvar [-a|-e] var1 var2 valor\n");
+            }
+            else{
+                //Modificar valor en arg3
+                int result=CambiarNombre(trozos[2],trozos[3],trozos[4],arg3);
+                if(result==-1){
+                    perror("Imposible cambiar variable");
+                }
+            }
+        }
+        else if(strcmp(trozos[1],"-e")==0){
+            if(trozos[3]==NULL || trozos[4]==NULL){
+                printf("Uso: subsvar [-a|-e] var1 var2 valor\n");
+            }
+            else{
+                //Modificar valor usando environ
+                int result=CambiarNombre(trozos[2],trozos[3],trozos[4],environ);
+                if(result==-1){
+                    perror("Imposible cambiar variable");
+                }
+            }
+        }
+        else{
+            printf("Uso: subsvar [-a|-e] var1 var2 valor\n");
+        }
+    }
+}
+
+void Cmd_fork (tListP *P)
+{
+	pid_t pid;
+	
+	if ((pid=fork())==0){
+        deleteListP(P);
+		printf ("ejecutando proceso %d\n", getpid());
+	}
+	else if (pid!=-1)
+		waitpid (pid,NULL,0);
 }
