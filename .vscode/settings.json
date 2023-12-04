@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "librerias.h": "c",
+        "string.h": "c"
+    }
+}
