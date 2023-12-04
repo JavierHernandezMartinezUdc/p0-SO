@@ -2,6 +2,7 @@
     "files.associations": {
         "librerias.h": "c",
         "string.h": "c",
-        "proc.h": "c"
+        "proc.h": "c",
+        "p3.h": "c"
     }
 }

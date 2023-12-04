@@ -1,7 +1,5 @@
 #include "p3.h"
 
-extern char **environ;
-
 void uid(char **trozos){
     uid_t ruid, euid;
 
@@ -20,7 +18,7 @@ void uid(char **trozos){
     }
 }
 
-void showvar(char **trozos, char **arg3){
+void showvar(char **trozos, char **arg3, char **environ){
     if(trozos[1]==NULL){
         //Mostrar todas las variables
         int i=0;
@@ -84,7 +82,7 @@ int CambiarVariable(char * var, char * valor, char *e[]) /*cambia una variable e
   return (pos);
 }
 
-void changevar(char **trozos, char **arg3){
+void changevar(char **trozos, char **arg3, char **environ){
     if(trozos[1]==NULL || trozos[2]==NULL){
         printf("Uso: changevar [-a|-e|-p] var valor\n");
     }
@@ -151,7 +149,7 @@ int CambiarNombre(char * viejo, char * nuevo, char * valor, char *e[]) /*cambia 
   return (pos);
 }
 
-void subsvar(char **trozos, char **arg3){
+void subsvar(char **trozos, char **arg3, char **environ){
     if(trozos[1]==NULL || trozos[2]==NULL){
         printf("Uso: subsvar [-a|-e] var1 var2 valor\n");
     }
@@ -186,7 +184,7 @@ void subsvar(char **trozos, char **arg3){
     }
 }
 
-void showenv(char **trozos, char **arg3){
+void showenv(char **trozos, char **arg3, char **environ){
     if(trozos[1]==NULL){
         int i=0;
         for(char **env = arg3; *env != NULL; env++){
