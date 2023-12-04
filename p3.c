@@ -1,17 +1,4 @@
 #include "p3.h"
-/*
-void uid(char **trozos){
-    if(trozos[1]==NUL){
-
-    }
-    else if(strcmp(trozos[1],'-get')==1){
-
-    }
-    else if(strcmp(trozos[1],'-set')==1){
-
-    }
-    else if(strcmp(trozos[1],''))
-}*/
 
 void Cmd_fork (char *tr[])
 {
