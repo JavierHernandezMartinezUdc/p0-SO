@@ -552,7 +552,7 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             Recursiva(atoi(trozos[1]));
             break;
         case 30:
-            //uid;
+            uid(trozos);
             break;
         case 31:
             showvar(trozos,envp,environ);

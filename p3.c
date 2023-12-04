@@ -1,17 +1,4 @@
 #include "p3.h"
-/*
-void uid(char **trozos){
-    if(trozos[1]==NUL){
-
-    }
-    else if(strcmp(trozos[1],'-get')==1){
-
-    }
-    else if(strcmp(trozos[1],'-set')==1){
-
-    }
-    else if(strcmp(trozos[1],''))
-}*/
 
 void Cmd_fork (char *tr[])
 {
@@ -60,20 +47,21 @@ int CambiarVariable(char * var, char * valor, char *e[]) /*cambia una variable e
     return (pos);
 }
 
-void showvar(char **trozos){
-    if(trozos[1]==0) {
-        extern char **environ; // Declaración externa de la variable que contiene las variables de entorno
+void uid(char **trozos){
+    uid_t ruid, euid;
+    gid_t rgid, egid;
 
-        int main() {
-            char **env_var = environ; // Puntero para iterar a través de las variables de entorno
+    ruid = getuid();
+    euid = geteuid();
 
-            // Iterar a través de las variables de entorno hasta que se alcance NULL (el final)
-            while (*env_var != NULL) {
-                printf("%s\n", *env_var);
-                env_var++;
-            }
+    if (trozos[1]== 0 || strcmp(trozos[1],"-get")==1) {
+        printf("ID de usuario real (RUID): %d\n", ruid);
+        printf("ID de usuario efectivo (EUID): %d\n", euid);
+    } else if(strscmp(trozos[1],"-set")==1){
+        if (strcmp(trozos[2],"-l")==1){
 
-            return 0;
+        }else{
+
         }
     }
 }
