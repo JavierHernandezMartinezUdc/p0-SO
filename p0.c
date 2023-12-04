@@ -18,7 +18,7 @@ paula.carril@udc.es
 #include "p2.h"
 #include "p3.h"
 
-void comandN(int numWords, char *trozos[], tListH *H, bool *terminado, tListF *L, tListM *M, tListP *P);
+void comandN(int numWords, char *trozos[], tListH *H, bool *terminado, tListF *L, tListM *M, tListP *P, char **arg3);
 /*
 //En trozos[0] gardase o comando e a partir de trozos[1] os argumentos
 int TrocearCadena(char* cadena, char* trozos[]){
@@ -459,7 +459,7 @@ bool isNumber(char *string){
 }
 */
 
-void procesarComando(int numWords, int comando, char *trozos[], bool *terminado, tListF *L, tListH *H, tListM *M, tListP *P){
+void procesarComando(int numWords, int comando, char *trozos[], bool *terminado, tListF *L, tListH *H, tListM *M, tListP *P, char **arg3){
     switch(comando){
         case 0:
             authors(trozos);
@@ -480,7 +480,7 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             hist(H,trozos);
             break;
         case 6:
-            comandN(numWords,trozos,H,terminado,L,M,P);
+            comandN(numWords,trozos,H,terminado,L,M,P,arg3);
             break;
         case 7:
             Cmd_open(trozos, L);
@@ -555,9 +555,10 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             uid(trozos);
             break;
         case 31:
-            showvar(trozos);
+            showvar(trozos, arg3);
             break;
         case 32:
+            changevar(trozos,arg3);
             break;
         case 33:
             break;
@@ -639,7 +640,7 @@ void freeAsignedBlocks(tListM M){
     }
 }
 
-int main(){
+int main(int argc, char *argv[], char **arg3){
     bool terminado=0;
     char *comando=malloc(100);
     char *comandoCompleto=malloc(100);
@@ -670,7 +671,7 @@ int main(){
             numWords=TrocearCadena(comando, trozos);
             eleccionComando=elegirComando(trozos[0]);
             insertarComandoHist(&H, comandoCompleto);
-            procesarComando(numWords, eleccionComando, trozos, &terminado, &L, &H, &M, &P);
+            procesarComando(numWords, eleccionComando, trozos, &terminado, &L, &H, &M, &P, arg3);
         }
     }
 
@@ -691,7 +692,7 @@ int main(){
     return 0;
 }
 
-void comandN(int numWords, char *trozos[], tListH *H, bool *terminado, tListF *L, tListM *M, tListP *P){
+void comandN(int numWords, char *trozos[], tListH *H, bool *terminado, tListF *L, tListM *M, tListP *P, char **arg3){
     tPosH i;
     tItemH p;
     tPosH q;
@@ -721,7 +722,7 @@ void comandN(int numWords, char *trozos[], tListH *H, bool *terminado, tListF *L
         
             TrocearCadena(p.nombre,trozos);
             printf("Ejecutando el hist (%d): %s\n",x,trozos[0]);
-            procesarComando(numWords, elegirComando(trozos[0]),trozos,terminado, L, H, M, P);
+            procesarComando(numWords, elegirComando(trozos[0]),trozos,terminado, L, H, M, P, arg3);
         }
     }
 }
