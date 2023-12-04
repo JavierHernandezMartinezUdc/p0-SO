@@ -14,7 +14,7 @@ tPosP firstP(tListP L){
 
 tPosP lastP(tListP L){
     tPosP p;
-    for(p=firstM(L);p->next!=NULL;p=p->next);
+    for(p=firstP(L);p->next!=NULL;p=p->next);
     return p;
 }
 
@@ -46,7 +46,7 @@ void deleteAtPositionP(tPosP pos, tListP *L){
 
 void deleteListP(tListP *L){
     tPosP p;
-    while(!isEmptyListM(*L)){
+    while(!isEmptyListP(*L)){
         p=*L;
         *L=(*L)->next;
         free(p);
@@ -77,6 +77,17 @@ bool insertItemP(tItemP d, tListP *L){
         }
         return true;
     }
+}
+
+bool updateItemP(tItemP d, tPosP p, tListP *L){
+    tPosP i;
+
+    for(i = *L;(i != NULL) && (i != p); i = i -> next);
+    if (i != NULL) {
+        i->data = d;
+        return true;
+    }
+    return false;
 }
 
 tPosP nextP(tPosP p, tListP L){

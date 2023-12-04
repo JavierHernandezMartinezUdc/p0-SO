@@ -1,3 +1,4 @@
 #include "librerias.h"
-//#include "proc.h"
+#include "proc.h"
+
 void showvar(char **trozos);

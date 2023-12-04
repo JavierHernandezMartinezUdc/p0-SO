@@ -18,7 +18,7 @@ paula.carril@udc.es
 #include "p2.h"
 #include "p3.h"
 
-void comandN(int numWords, char *trozos[], tListH *H, bool *terminado, tListF *L, tListM *M);
+void comandN(int numWords, char *trozos[], tListH *H, bool *terminado, tListF *L, tListM *M, tListP *P);
 /*
 //En trozos[0] gardase o comando e a partir de trozos[1] os argumentos
 int TrocearCadena(char* cadena, char* trozos[]){
@@ -433,6 +433,8 @@ void help(char *trozos[]) {
             printf("showenv [-environ|-addr]         Muestra el entorno del proceso\n        -environ: accede usando environ (en lugar del tercer arg de main)\n        -addr: muestra el valor y donde se almacenan environ y el 3er arg main\n");
         } else if(strcmp(trozos[1],"fork") == 0) {
             printf("fork    El shell hace fork y queda en espera a que su hijo termine\n");
+        } else if(strcmp(trozos[1],"exec")==0){
+            printf("exec prog args    Ejecuta, sin crear proceso, prog con argumentos\n");
         } else if(strcmp(trozos[1],"jobs") == 0) {
             printf("jobs    Lista los procesos en segundo plano\n");
         } else if(strcmp(trozos[1],"deljobs") == 0) {
@@ -457,7 +459,7 @@ bool isNumber(char *string){
 }
 */
 
-void procesarComando(int numWords, int comando, char *trozos[], bool *terminado, tListF *L, tListH *H, tListM *M){
+void procesarComando(int numWords, int comando, char *trozos[], bool *terminado, tListF *L, tListH *H, tListM *M, tListP *P){
     switch(comando){
         case 0:
             authors(trozos);
@@ -478,7 +480,7 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             hist(H,trozos);
             break;
         case 6:
-            comandN(numWords,trozos,H,terminado,L,M);
+            comandN(numWords,trozos,H,terminado,L,M,P);
             break;
         case 7:
             Cmd_open(trozos, L);
@@ -646,6 +648,7 @@ int main(){
     tListF L;
     tListH H;
     tListM M;
+    tListP P;
 
     createEmptyListF(&L);
     insertarESstd(&L);
@@ -653,6 +656,8 @@ int main(){
     createEmptyListH(&H);
 
     createEmptyListM(&M);
+
+    createEmptyListP(&P);
 
     while(!terminado){
         imprimirPrompt();
@@ -665,7 +670,7 @@ int main(){
             numWords=TrocearCadena(comando, trozos);
             eleccionComando=elegirComando(trozos[0]);
             insertarComandoHist(&H, comandoCompleto);
-            procesarComando(numWords, eleccionComando, trozos, &terminado, &L, &H,&M);
+            procesarComando(numWords, eleccionComando, trozos, &terminado, &L, &H, &M, &P);
         }
     }
 
@@ -678,6 +683,7 @@ int main(){
     listMemFree(&L);
     deleteListH(&H);
     deleteListM(&M);
+    deleteListP(&P);
     free(comando);
     free(trozos);
     free(comandoCompleto);
@@ -685,7 +691,7 @@ int main(){
     return 0;
 }
 
-void comandN(int numWords, char *trozos[], tListH *H, bool *terminado, tListF *L, tListM *M){
+void comandN(int numWords, char *trozos[], tListH *H, bool *terminado, tListF *L, tListM *M, tListP *P){
     tPosH i;
     tItemH p;
     tPosH q;
@@ -715,7 +721,7 @@ void comandN(int numWords, char *trozos[], tListH *H, bool *terminado, tListF *L
         
             TrocearCadena(p.nombre,trozos);
             printf("Ejecutando el hist (%d): %s\n",x,trozos[0]);
-            procesarComando(numWords, elegirComando(trozos[0]),trozos,terminado, L, H, M);
+            procesarComando(numWords, elegirComando(trozos[0]),trozos,terminado, L, H, M, P);
         }
     }
 }

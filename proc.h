@@ -1,15 +1,14 @@
 #include "librerias.h"
 
 typedef enum status{
-    null, FINISHED, STOPPED, SIGNALED, ACTIVE
+    FINISHED, STOPPED, SIGNALED, ACTIVE
 } status;
 
 typedef struct tItemP{
     pid_t pid;
     time_t time;
     status estado;
-    //command line
-    //priority
+    char *command;
 } tItemP;
 
 typedef struct tNodeP *tPosP;
@@ -30,4 +29,5 @@ tItemP getItemP(tPosP pos, tListP L);
 void deleteAtPositionP(tPosP pos, tListP *L);
 void deleteListP(tListP *L);
 bool insertItemP(tItemP d, tListP *L);
+bool updateItemP(tItemP d, tPosP p, tListP *L);
 tPosP nextP(tPosP p, tListP L);

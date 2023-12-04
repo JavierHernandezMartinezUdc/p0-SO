@@ -61,19 +61,28 @@ int CambiarVariable(char * var, char * valor, char *e[]) /*cambia una variable e
 }
 
 void showvar(char **trozos){
-    if(trozos[1]==0) {
-        extern char **environ; // Declaración externa de la variable que contiene las variables de entorno
+    extern char **environ;
 
-        int main() {
-            char **env_var = environ; // Puntero para iterar a través de las variables de entorno
+    if(trozos[1]==NULL){
+        //Mostrar todas las variables
+        int i=0;
+        for(char **env = environ; *env != NULL; env++){
+            printf("%p->main arg3[%d]=(%p) %s\n",(void *)env,i,(void *)*env,*env);
+            i++;
+        }
+    }
+    else{
+        char *valor=getenv(trozos[1]);
 
-            // Iterar a través de las variables de entorno hasta que se alcance NULL (el final)
-            while (*env_var != NULL) {
-                printf("%s\n", *env_var);
-                env_var++;
+        for(char **env = environ; *env != NULL; env++){
+            if(strncmp(*env,trozos[1],strlen(trozos[1]))==0){
+                printf("Con arg3 main %s(%p) @%p\n",*env,(void *)*env, (void *)env);
+                printf("  Con environ %s(%p) @%p\n",*env,(void *)*env, (void *)env);
             }
+        }
 
-            return 0;
+        if(valor!=NULL){
+            printf("   Con getenv %s(%p)\n",valor,(void *)valor);
         }
     }
 }
