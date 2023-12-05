@@ -216,3 +216,21 @@ void Cmd_fork (tListP *P)
 	else if (pid!=-1)
 		waitpid (pid,NULL,0);
 }
+
+void exec(char **trozos, int numWords){
+    char comando[1024]="";
+
+    for(int i=1;i<numWords;i++){
+        strcat(comando,trozos[i]);
+        if(i!=numWords-1){
+            strcat(comando," ");
+        }
+    }
+
+    if(access(trozos[1],X_OK)!=0){
+        perror("Imposible ejecutar");
+    }
+    else{
+        system(comando);
+    }
+}

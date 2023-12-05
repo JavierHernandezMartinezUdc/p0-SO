@@ -572,6 +572,7 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             Cmd_fork(P);
             break;
         case 36:
+            exec(trozos, numWords);
             break;
         case 37:
             break;
