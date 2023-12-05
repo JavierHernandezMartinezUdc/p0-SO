@@ -234,3 +234,79 @@ void exec(char **trozos, int numWords){
         system(comando);
     }
 }
+
+void FechaHora(time_t t, char *dest){
+    struct tm *local_time = localtime(&t);
+
+    if (local_time == NULL) {
+        perror("localtime");
+        return;
+    }
+
+    int dia = local_time->tm_mday;
+    int mes = local_time->tm_mon + 1;
+    int year = local_time->tm_year + 1900;
+    int hor = local_time->tm_hour;
+    int min = local_time->tm_min;
+    int seg = local_time->tm_sec;
+
+    sprintf(dest,"%d/%d/%d %d:%d:%d",year,mes,dia,hor,min,seg);
+}
+
+void StatusToString(status status, char *dest){
+    if(status==FINISHED){
+        strcpy(dest,"FINISHED");
+    }
+    else if(status==STOPPED){
+        strcpy(dest,"STOPPED");
+    }
+    else if(status==SIGNALED){
+        strcpy(dest,"SIGNALED");
+    }
+    else if(status==ACTIVE){
+        strcpy(dest,"ACTIVE");
+    }
+}
+
+void jobs(tListP P){
+    tPosP p;
+    tItemP x;
+    char fecha[1024];
+    char status[1024];
+    
+    for(p=firstP(P);p!=NULL;p=nextP(p,P)){
+        x=getItemP(p,P);
+
+        FechaHora(x.time,fecha);
+        StatusToString(x.estado,status);
+
+        printf("  %d       %s p=%d %s %s (%d) %s",x.pid,/*User*/,/*Algo de salida*/,fecha,status,/*Algo de salida*/,x.command);
+    }
+}
+
+void deljobs(char **trozos, tListP *P){
+    tPosP p;
+
+    if(trozos[1]==NULL){
+        jobs(*P);
+    }
+    else if(strcmp(trozos[1],"-term")==0){
+        for(p=firstP(*P);p!=NULL;p=nextP(p,*P)){
+            if(getItemP(p,*P).estado==FINISHED){
+                deleteAtPositionP(p,P);
+                p=firstP(*P);
+            }
+        }
+    }
+    else if(strcmp(trozos[1],"-sig")==0){
+        for(p=firstP(*P);p!=NULL;p=nextP(p,*P)){
+            if(getItemP(p,*P).estado==SIGNALED){ //Condicion???
+                deleteAtPositionP(p,P);
+                p=firstP(*P);
+            }
+        }
+    }
+    else{
+        jobs(*P);
+    }
+}
