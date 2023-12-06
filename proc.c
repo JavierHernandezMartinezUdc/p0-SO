@@ -22,7 +22,11 @@ tItemP getItemP(tPosP pos, tListP L){
     return pos->data;
 }
 
-//findItemP
+tPosP findItem(pid_t pid, tListP L){
+    tPosP p;
+    for(p = L;(p != NULL) && (p -> data.pid != pid); p = p -> next);
+    return p;
+}
 
 void deleteAtPositionP(tPosP pos, tListP *L){
     tPosP q;
@@ -54,7 +58,7 @@ void deleteListP(tListP *L){
 }
 
 bool createNodeP(tPosP *p){
-    *p=malloc(sizeof(**p));
+    *p=malloc(sizeof(struct tNodeP));
     return *p!=NULL;
 }
 

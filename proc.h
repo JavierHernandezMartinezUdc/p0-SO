@@ -8,7 +8,7 @@ typedef struct tItemP{
     pid_t pid;
     time_t time;
     status estado;
-    char *command;
+    char command[1024];
 } tItemP;
 
 typedef struct tNodeP *tPosP;
@@ -25,7 +25,7 @@ bool isEmptyListP(tListP L);
 tPosP firstP(tListP L);
 tPosP lastP(tListP L);
 tItemP getItemP(tPosP pos, tListP L);
-//findItemP
+tPosP findItem(pid_t pid, tListP L);
 void deleteAtPositionP(tPosP pos, tListP *L);
 void deleteListP(tListP *L);
 bool insertItemP(tItemP d, tListP *L);

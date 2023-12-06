@@ -18,3 +18,5 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/mman.h>
+#include <sys/resource.h>
+//#include <signal.h> Por algun motivo no funciona si se incluye aqui

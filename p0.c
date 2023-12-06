@@ -573,15 +573,20 @@ void procesarComando(int numWords, int comando, char *trozos[], bool *terminado,
             break;
         case 36:
             exec(trozos, numWords);
+            salir(terminado);
             break;
         case 37:
+            jobs(*P);
             break;
         case 38:
+            deljobs(trozos,P);
             break;
         case 39:
+            job(trozos,P);
             break;
         default:
-            printf("No ejecutado: No such file or directory\n");
+            //printf("No ejecutado: No such file or directory\n");
+            newProcess(trozos,P,numWords);
             break;
     }
 }

@@ -1,4 +1,5 @@
 #include "p3.h"
+#include <signal.h>
 
 void uid(char **trozos){
     uid_t ruid, euid;
@@ -227,15 +228,10 @@ void exec(char **trozos, int numWords){
         }
     }
 
-    if(access(trozos[1],X_OK)!=0){
-        perror("Imposible ejecutar");
-    }
-    else{
-        system(comando);
-    }
+    system(comando);
 }
 
-void FechaHora(time_t t, char *dest){
+void FechaHoraP(time_t t, char *dest){
     struct tm *local_time = localtime(&t);
 
     if (local_time == NULL) {
@@ -273,14 +269,29 @@ void jobs(tListP P){
     tItemP x;
     char fecha[1024];
     char status[1024];
-    
+    int prio;
+
     for(p=firstP(P);p!=NULL;p=nextP(p,P)){
         x=getItemP(p,P);
 
-        FechaHora(x.time,fecha);
+        uid_t uid=getuid();
+        struct passwd *userInfo = getpwuid(uid);
+        if (userInfo == NULL) {
+            perror("Error al obtener la información del usuario");
+            return;
+        }
+
+        errno=0;
+        prio=getpriority(PRIO_PROCESS,x.pid);
+        if(errno==EACCES || errno==EINVAL || errno==EPERM || errno==ESRCH){
+            perror("Error prioridad");
+            return;
+        }
+
+        FechaHoraP(x.time,fecha);
         StatusToString(x.estado,status);
 
-        printf("  %d       %s p=%d %s %s (%d) %s",x.pid,/*User*/,/*Algo de salida*/,fecha,status,/*Algo de salida*/,x.command);
+        printf("  %d       %s p=%d %s %s (%s) %s",x.pid,userInfo->pw_name,prio,fecha,status,"/*Algo de salida*/",x.command);
     }
 }
 
@@ -309,4 +320,122 @@ void deljobs(char **trozos, tListP *P){
     else{
         jobs(*P);
     }
+}
+
+void job(char **trozos, tListP *P){
+    tPosP p;
+    tItemP x;
+    char fecha[1024];
+    char status[1024];
+    int prio;
+
+    if(trozos[1]!=NULL){
+        if(strcmp(trozos[1],"-fg")==0){ //Traer a primer plano
+            p=findItem(atoi(trozos[2]), *P);
+            if(p==NULL){
+                return;
+            }
+            x=getItemP(p,*P);
+            if(x.estado==FINISHED){
+                printf("El proceso ya esta finalizado\n");
+                return;
+            }
+            if(kill(x.pid, SIGCONT)==-1){
+                perror("Imposible traer a foreground");
+                return;
+            }
+            printf("Proceso %d ha terminado\n",x.pid);
+            deleteAtPositionP(p,P);
+        }
+        else{ //Mostrar info
+            p=findItem(atoi(trozos[1]), *P);
+            if(p==NULL){
+                return;
+            }
+            x=getItemP(p,*P);
+
+            uid_t uid=getuid();
+            struct passwd *userInfo = getpwuid(uid);
+            if (userInfo == NULL) {
+                perror("Error al obtener la información del usuario");
+                return;
+            }
+
+            errno=0;
+            prio=getpriority(PRIO_PROCESS,x.pid);
+            if(errno==EACCES || errno==EINVAL || errno==EPERM || errno==ESRCH){
+                perror("Error prioridad");
+                return;
+            }
+
+            FechaHoraP(x.time,fecha);
+            StatusToString(x.estado,status);
+
+            printf("  %d       %s p=%d %s %s (%s) %s",x.pid,userInfo->pw_name,prio,fecha,status,"/*Algo de salida*/",x.command);
+        }
+    }
+}
+
+void newProcess(char **trozos, tListP *P, int numWords){
+    pid_t pid;
+    char **args=malloc(sizeof(char*) * numWords);
+    tItemP x;
+    char comando[1024]="";
+
+    for(int i=0;i<numWords;i++){ //Copia todo menos "&"
+        if(i!=numWords-1){
+            args[i]=trozos[i];
+        }
+    }
+    args[numWords-1]=NULL;
+
+    /* Mini test de args
+    for(int i=0;i<numWords-1;i++){
+        printf("%s\n",args[i]);
+    }
+    return;
+    */
+
+    for(int i=0;i<numWords;i++){
+        if(i!=numWords-1){
+            strcat(comando,trozos[i]);
+            if(i!=numWords-2){
+                strcat(comando," ");
+            }
+        }
+    }
+
+    if(strcmp(trozos[numWords-1],"&")==0){ //Background
+        pid=fork();
+
+        if(pid==0){
+            x.pid=getpid();
+            time(&x.time);
+            x.estado=ACTIVE;
+            strcpy(x.command,comando);
+            if(!insertItemP(x,P)){
+                printf("Imposible insertar\n");
+                return;
+            }
+
+            execvp(trozos[0],args);
+            exit(EXIT_SUCCESS);
+        }
+        else if(pid!=-1){
+            
+        }
+    }
+    else{ //Foreground
+        pid=fork();
+
+        if(pid==0){
+            execvp(trozos[0],args);
+            exit(EXIT_SUCCESS);
+        }
+        else if(pid!=-1){
+            waitpid(pid,NULL,0);
+        }
+    }
+
+    free(args);
 }
