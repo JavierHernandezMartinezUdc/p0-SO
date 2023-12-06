@@ -7,14 +7,19 @@ void uid(char **trozos){
     ruid = getuid();
     euid = geteuid();
 
-    if (trozos[1]== 0 || strcmp(trozos[1],"-get")==1) {
+    if (trozos[1] == NULL || strcmp(trozos[1],"-get")==0) {
         printf("ID de usuario real: %d, (%s)\n", ruid, getpwuid(ruid)->pw_name);
         printf("ID de usuario efectivo: %d, (%s)\n", euid, getpwuid(euid)->pw_name);
     } else if(strcmp(trozos[1],"-set")==0){
         if (strcmp(trozos[2],"-l")==0){
             //login
+            
         }else{
             //numero (id)
+            if(setuid(atoi(trozos[2]))==-1){
+                perror("Error setuid");
+                return;
+            }
         }
     }
 }
@@ -270,16 +275,10 @@ void jobs(tListP P){
     char fecha[1024];
     char status[1024];
     int prio;
+    int endValue;
 
     for(p=firstP(P);p!=NULL;p=nextP(p,P)){
         x=getItemP(p,P);
-
-        uid_t uid=getuid();
-        struct passwd *userInfo = getpwuid(uid);
-        if (userInfo == NULL) {
-            perror("Error al obtener la información del usuario");
-            return;
-        }
 
         errno=0;
         prio=getpriority(PRIO_PROCESS,x.pid);
@@ -288,10 +287,32 @@ void jobs(tListP P){
             return;
         }
 
+        if(waitpid(x.pid, &endValue, 0)==x.pid){
+            if(WIFEXITED(endValue)){
+                x.estado=FINISHED;
+                prio=-1;
+            } else if (WIFCONTINUED(endValue)){
+                x.estado=ACTIVE;
+            } else if (WIFSTOPPED(endValue)){
+                x.estado=STOPPED;
+            } else if (WIFSIGNALED(endValue)){
+                x.estado=SIGNALED;
+            }
+        }
+
+        updateItemP(x,p,&P);
+
+        uid_t uid=getuid();
+        struct passwd *userInfo = getpwuid(uid);
+        if (userInfo == NULL) {
+            perror("Error al obtener la información del usuario");
+            return;
+        }
+
         FechaHoraP(x.time,fecha);
         StatusToString(x.estado,status);
 
-        printf("  %d       %s p=%d %s %s (%s) %s",x.pid,userInfo->pw_name,prio,fecha,status,"/*Algo de salida*/",x.command);
+        printf("  %d       %s p=%d %s %s (%d) %s\n",x.pid,userInfo->pw_name,prio,fecha,status,WEXITSTATUS(endValue),x.command);
     }
 }
 
@@ -328,24 +349,11 @@ void job(char **trozos, tListP *P){
     char fecha[1024];
     char status[1024];
     int prio;
+    int endValue;
 
     if(trozos[1]!=NULL){
         if(strcmp(trozos[1],"-fg")==0){ //Traer a primer plano
-            p=findItem(atoi(trozos[2]), *P);
-            if(p==NULL){
-                return;
-            }
-            x=getItemP(p,*P);
-            if(x.estado==FINISHED){
-                printf("El proceso ya esta finalizado\n");
-                return;
-            }
-            if(kill(x.pid, SIGCONT)==-1){
-                perror("Imposible traer a foreground");
-                return;
-            }
-            printf("Proceso %d ha terminado\n",x.pid);
-            deleteAtPositionP(p,P);
+            //TODO
         }
         else{ //Mostrar info
             p=findItem(atoi(trozos[1]), *P);
@@ -354,13 +362,6 @@ void job(char **trozos, tListP *P){
             }
             x=getItemP(p,*P);
 
-            uid_t uid=getuid();
-            struct passwd *userInfo = getpwuid(uid);
-            if (userInfo == NULL) {
-                perror("Error al obtener la información del usuario");
-                return;
-            }
-
             errno=0;
             prio=getpriority(PRIO_PROCESS,x.pid);
             if(errno==EACCES || errno==EINVAL || errno==EPERM || errno==ESRCH){
@@ -368,10 +369,32 @@ void job(char **trozos, tListP *P){
                 return;
             }
 
+            if(waitpid(x.pid, &endValue, 0)==x.pid){
+                if(WIFEXITED(endValue)){
+                    x.estado=FINISHED;
+                    prio=-1;
+                } else if (WIFCONTINUED(endValue)){
+                    x.estado=ACTIVE;
+                } else if (WIFSTOPPED(endValue)){
+                    x.estado=STOPPED;
+                } else if (WIFSIGNALED(endValue)){
+                    x.estado=SIGNALED;
+                }
+            }
+
+            updateItemP(x,p,P);
+
+            uid_t uid=getuid();
+            struct passwd *userInfo = getpwuid(uid);
+            if (userInfo == NULL) {
+                perror("Error al obtener la información del usuario");
+                return;
+            }
+
             FechaHoraP(x.time,fecha);
             StatusToString(x.estado,status);
 
-            printf("  %d       %s p=%d %s %s (%s) %s",x.pid,userInfo->pw_name,prio,fecha,status,"/*Algo de salida*/",x.command);
+            printf("  %d       %s p=%d %s %s (%d) %s\n",x.pid,userInfo->pw_name,prio,fecha,status,WEXITSTATUS(endValue),x.command);
         }
     }
 }
@@ -409,20 +432,20 @@ void newProcess(char **trozos, tListP *P, int numWords){
         pid=fork();
 
         if(pid==0){
-            x.pid=getpid();
-            time(&x.time);
-            x.estado=ACTIVE;
-            strcpy(x.command,comando);
-            if(!insertItemP(x,P)){
-                printf("Imposible insertar\n");
-                return;
-            }
-
             execvp(trozos[0],args);
             exit(EXIT_SUCCESS);
         }
         else if(pid!=-1){
-            
+            //El padre no espera por el hijo
+        }
+
+        x.pid=getpid();
+        time(&x.time);
+        x.estado=ACTIVE;
+        strcpy(x.command,comando);
+        if(!insertItemP(x,P)){
+            printf("Imposible insertar\n");
+            return;
         }
     }
     else{ //Foreground
