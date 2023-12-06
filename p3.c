@@ -280,23 +280,34 @@ void jobs(tListP P){
     for(p=firstP(P);p!=NULL;p=nextP(p,P)){
         x=getItemP(p,P);
 
-        errno=0;
-        prio=getpriority(PRIO_PROCESS,x.pid);
-        if(errno==EACCES || errno==EINVAL || errno==EPERM || errno==ESRCH){
-            perror("Error prioridad");
-            return;
-        }
-
         if(waitpid(x.pid, &endValue, 0)==x.pid){
             if(WIFEXITED(endValue)){
                 x.estado=FINISHED;
                 prio=-1;
             } else if (WIFCONTINUED(endValue)){
                 x.estado=ACTIVE;
+                errno=0;
+                prio=getpriority(PRIO_PROCESS,x.pid);
+                if(errno==EACCES || errno==EINVAL || errno==EPERM || errno==ESRCH){
+                    perror("Error prioridad");
+                    return;
+                }
             } else if (WIFSTOPPED(endValue)){
                 x.estado=STOPPED;
+                errno=0;
+                prio=getpriority(PRIO_PROCESS,x.pid);
+                if(errno==EACCES || errno==EINVAL || errno==EPERM || errno==ESRCH){
+                    perror("Error prioridad");
+                    return;
+                }
             } else if (WIFSIGNALED(endValue)){
                 x.estado=SIGNALED;
+                errno=0;
+                prio=getpriority(PRIO_PROCESS,x.pid);
+                if(errno==EACCES || errno==EINVAL || errno==EPERM || errno==ESRCH){
+                    perror("Error prioridad");
+                    return;
+                }
             }
         }
 
@@ -362,23 +373,32 @@ void job(char **trozos, tListP *P){
             }
             x=getItemP(p,*P);
 
-            errno=0;
-            prio=getpriority(PRIO_PROCESS,x.pid);
-            if(errno==EACCES || errno==EINVAL || errno==EPERM || errno==ESRCH){
-                perror("Error prioridad");
-                return;
-            }
-
             if(waitpid(x.pid, &endValue, 0)==x.pid){
                 if(WIFEXITED(endValue)){
                     x.estado=FINISHED;
                     prio=-1;
                 } else if (WIFCONTINUED(endValue)){
                     x.estado=ACTIVE;
+                    errno=0;
+                    prio=getpriority(PRIO_PROCESS,x.pid);
+                    if(errno==EACCES || errno==EINVAL || errno==EPERM || errno==ESRCH){
+                        perror("Error prioridad");
+                        return;
+                    }
                 } else if (WIFSTOPPED(endValue)){
                     x.estado=STOPPED;
+                    prio=getpriority(PRIO_PROCESS,x.pid);
+                    if(errno==EACCES || errno==EINVAL || errno==EPERM || errno==ESRCH){
+                        perror("Error prioridad");
+                        return;
+                    }
                 } else if (WIFSIGNALED(endValue)){
                     x.estado=SIGNALED;
+                    prio=getpriority(PRIO_PROCESS,x.pid);
+                    if(errno==EACCES || errno==EINVAL || errno==EPERM || errno==ESRCH){
+                        perror("Error prioridad");
+                        return;
+                    }
                 }
             }
 
@@ -432,6 +452,7 @@ void newProcess(char **trozos, tListP *P, int numWords){
         pid=fork();
 
         if(pid==0){
+            x.pid=getpid();
             execvp(trozos[0],args);
             exit(EXIT_SUCCESS);
         }
@@ -439,7 +460,6 @@ void newProcess(char **trozos, tListP *P, int numWords){
             //El padre no espera por el hijo
         }
 
-        x.pid=getpid();
         time(&x.time);
         x.estado=ACTIVE;
         strcpy(x.command,comando);
