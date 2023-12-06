@@ -279,19 +279,21 @@ void jobs(tListP P){
 
     for(p=firstP(P);p!=NULL;p=nextP(p,P)){
         x=getItemP(p,P);
-
-        if(waitpid(x.pid, &endValue, 0)==x.pid){
-            if(WIFEXITED(endValue)){
-                x.estado=FINISHED;
-                x.endValue=WEXITSTATUS(endValue);
-            }
-            else if (WIFSTOPPED(endValue)){
-                x.estado=STOPPED;
-                x.endValue=WTERMSIG(endValue);
-            }
-            else if (WIFSIGNALED(endValue)){
-                x.estado=SIGNALED;
-                x.endValue=WTERMSIG(endValue);
+        
+        if(x.estado!=FINISHED){
+            if(waitpid(x.pid, &endValue, WNOHANG | WUNTRACED)==x.pid){
+                if(WIFEXITED(endValue)){
+                    x.estado=FINISHED;
+                    x.endValue=WEXITSTATUS(endValue);
+                }
+                else if (WIFSTOPPED(endValue)){
+                    x.estado=STOPPED;
+                    x.endValue=WTERMSIG(endValue);
+                }
+                else if (WIFSIGNALED(endValue)){
+                    x.estado=SIGNALED;
+                    x.endValue=WTERMSIG(endValue);
+                }
             }
         }
 
@@ -309,7 +311,7 @@ void jobs(tListP P){
         FechaHoraP(x.time,fecha);
         StatusToString(x.estado,status);
 
-        printf("  %d       %s p=%d %s %s (%d) %s\n",x.pid,userInfo->pw_name,prio,fecha,status,WEXITSTATUS(endValue),x.command);
+        printf("  %d       %s p=%d %s %s (%d) %s\n",x.pid,userInfo->pw_name,prio,fecha,status,x.endValue,x.command);
     }
 }
 
@@ -323,7 +325,9 @@ void deljobs(char **trozos, tListP *P){
         for(p=firstP(*P);p!=NULL;p=nextP(p,*P)){
             if(getItemP(p,*P).estado==FINISHED){
                 deleteAtPositionP(p,P);
-                p=firstP(*P);
+                if(!isEmptyListP(*P)){
+                    p=firstP(*P);
+                }
             }
         }
     }
@@ -331,7 +335,9 @@ void deljobs(char **trozos, tListP *P){
         for(p=firstP(*P);p!=NULL;p=nextP(p,*P)){
             if(getItemP(p,*P).estado==SIGNALED){ //Condicion???
                 deleteAtPositionP(p,P);
-                p=firstP(*P);
+                if(!isEmptyListP(*P)){
+                    p=firstP(*P);
+                }
             }
         }
     }
@@ -350,16 +356,22 @@ void job(char **trozos, tListP *P){
 
     if(trozos[1]!=NULL){
         if(strcmp(trozos[1],"-fg")==0){ //Traer a primer plano
-            //TODO
-        }
-        else{ //Mostrar info
-            p=findItem(atoi(trozos[1]), *P);
+            p=findItem(atoi(trozos[2]), *P);
             if(p==NULL){
                 return;
             }
             x=getItemP(p,*P);
 
-            if(waitpid(x.pid, &endValue, 0)==x.pid){
+            if(x.estado==FINISHED){
+                printf("Comando ya terminado\n");
+                return;
+            }
+
+            if(kill(x.pid, SIGCONT) == -1) {
+                perror("Error al enviar la señal");
+                return;
+            }
+            if(waitpid(x.pid,&endValue,0)==x.pid){
                 if(WIFEXITED(endValue)){
                     x.estado=FINISHED;
                     x.endValue=WEXITSTATUS(endValue);
@@ -371,6 +383,32 @@ void job(char **trozos, tListP *P){
                 else if (WIFSIGNALED(endValue)){
                     x.estado=SIGNALED;
                     x.endValue=WTERMSIG(endValue);
+                }
+            }
+            StatusToString(x.estado,status);
+            printf("El proceso %d ha terminado con estado %s\n",x.pid,status);
+        }
+        else{ //Mostrar info
+            p=findItem(atoi(trozos[1]), *P);
+            if(p==NULL){
+                return;
+            }
+            x=getItemP(p,*P);
+
+            if(x.estado!=FINISHED){
+                if(waitpid(x.pid, &endValue, WNOHANG | WUNTRACED)==x.pid){
+                    if(WIFEXITED(endValue)){
+                        x.estado=FINISHED;
+                        x.endValue=WEXITSTATUS(endValue);
+                    }
+                    else if (WIFSTOPPED(endValue)){
+                        x.estado=STOPPED;
+                        x.endValue=WTERMSIG(endValue);
+                    }
+                    else if (WIFSIGNALED(endValue)){
+                        x.estado=SIGNALED;
+                        x.endValue=WTERMSIG(endValue);
+                    }
                 }
             }
 
@@ -388,7 +426,7 @@ void job(char **trozos, tListP *P){
             FechaHoraP(x.time,fecha);
             StatusToString(x.estado,status);
 
-            printf("  %d       %s p=%d %s %s (%d) %s\n",x.pid,userInfo->pw_name,prio,fecha,status,WEXITSTATUS(endValue),x.command);
+            printf("  %d       %s p=%d %s %s (%d) %s\n",x.pid,userInfo->pw_name,prio,fecha,status,x.endValue,x.command);
         }
     }
 }
@@ -398,6 +436,7 @@ void newProcess(char **trozos, tListP *P, int numWords){
     char **args=malloc(sizeof(char*) * numWords);
     tItemP x;
     char comando[1024]="";
+    int endValue;
 
     for(int i=0;i<numWords;i++){ //Copia todo menos "&"
         if(i!=numWords-1){
@@ -426,7 +465,6 @@ void newProcess(char **trozos, tListP *P, int numWords){
         pid=fork();
 
         if(pid==0){
-            x.pid=getpid();
             execvp(trozos[0],args);
             exit(EXIT_SUCCESS);
         }
@@ -434,6 +472,7 @@ void newProcess(char **trozos, tListP *P, int numWords){
             //El padre no espera por el hijo
         }
 
+        x.pid=pid;
         time(&x.time);
         x.estado=ACTIVE;
         strcpy(x.command,comando);
