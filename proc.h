@@ -8,6 +8,7 @@ typedef struct tItemP{
     pid_t pid;
     time_t time;
     status estado;
+    int endValue;
     char command[1024];
 } tItemP;
 

@@ -283,33 +283,19 @@ void jobs(tListP P){
         if(waitpid(x.pid, &endValue, 0)==x.pid){
             if(WIFEXITED(endValue)){
                 x.estado=FINISHED;
-                prio=-1;
-            } else if (WIFCONTINUED(endValue)){
-                x.estado=ACTIVE;
-                errno=0;
-                prio=getpriority(PRIO_PROCESS,x.pid);
-                if(errno==EACCES || errno==EINVAL || errno==EPERM || errno==ESRCH){
-                    perror("Error prioridad");
-                    return;
-                }
-            } else if (WIFSTOPPED(endValue)){
+                x.endValue=WEXITSTATUS(endValue);
+            }
+            else if (WIFSTOPPED(endValue)){
                 x.estado=STOPPED;
-                errno=0;
-                prio=getpriority(PRIO_PROCESS,x.pid);
-                if(errno==EACCES || errno==EINVAL || errno==EPERM || errno==ESRCH){
-                    perror("Error prioridad");
-                    return;
-                }
-            } else if (WIFSIGNALED(endValue)){
+                x.endValue=WTERMSIG(endValue);
+            }
+            else if (WIFSIGNALED(endValue)){
                 x.estado=SIGNALED;
-                errno=0;
-                prio=getpriority(PRIO_PROCESS,x.pid);
-                if(errno==EACCES || errno==EINVAL || errno==EPERM || errno==ESRCH){
-                    perror("Error prioridad");
-                    return;
-                }
+                x.endValue=WTERMSIG(endValue);
             }
         }
+
+        prio=getpriority(PRIO_PROCESS,x.pid);
 
         updateItemP(x,p,&P);
 
@@ -376,31 +362,19 @@ void job(char **trozos, tListP *P){
             if(waitpid(x.pid, &endValue, 0)==x.pid){
                 if(WIFEXITED(endValue)){
                     x.estado=FINISHED;
-                    prio=-1;
-                } else if (WIFCONTINUED(endValue)){
-                    x.estado=ACTIVE;
-                    errno=0;
-                    prio=getpriority(PRIO_PROCESS,x.pid);
-                    if(errno==EACCES || errno==EINVAL || errno==EPERM || errno==ESRCH){
-                        perror("Error prioridad");
-                        return;
-                    }
-                } else if (WIFSTOPPED(endValue)){
+                    x.endValue=WEXITSTATUS(endValue);
+                }
+                else if (WIFSTOPPED(endValue)){
                     x.estado=STOPPED;
-                    prio=getpriority(PRIO_PROCESS,x.pid);
-                    if(errno==EACCES || errno==EINVAL || errno==EPERM || errno==ESRCH){
-                        perror("Error prioridad");
-                        return;
-                    }
-                } else if (WIFSIGNALED(endValue)){
+                    x.endValue=WTERMSIG(endValue);
+                }
+                else if (WIFSIGNALED(endValue)){
                     x.estado=SIGNALED;
-                    prio=getpriority(PRIO_PROCESS,x.pid);
-                    if(errno==EACCES || errno==EINVAL || errno==EPERM || errno==ESRCH){
-                        perror("Error prioridad");
-                        return;
-                    }
+                    x.endValue=WTERMSIG(endValue);
                 }
             }
+
+            prio=getpriority(PRIO_PROCESS,x.pid);
 
             updateItemP(x,p,P);
 
