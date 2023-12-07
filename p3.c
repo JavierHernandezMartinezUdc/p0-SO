@@ -1,28 +1,54 @@
 #include "p3.h"
 #include <signal.h>
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <string.h>
+
 void uid(char **trozos){
     uid_t ruid, euid;
 
     ruid = getuid();
     euid = geteuid();
 
-    if (trozos[1] == NULL || strcmp(trozos[1],"-get")==0) {
+    if (trozos[1] == NULL || strcmp(trozos[1], "-get") == 0) {
         printf("ID de usuario real: %d, (%s)\n", ruid, getpwuid(ruid)->pw_name);
         printf("ID de usuario efectivo: %d, (%s)\n", euid, getpwuid(euid)->pw_name);
-    } else if(strcmp(trozos[1],"-set")==0){
-        if (strcmp(trozos[2],"-l")==0){
-            //login
-            
-        }else{
-            //numero (id)
-            if(setuid(atoi(trozos[2]))==-1){
-                perror("Error setuid");
-                return;
+    } else if(strcmp(trozos[1], "-set") == 0){
+        if (trozos[2] != NULL && strcmp(trozos[2], "-l") == 0) {
+            // Cambiar login
+            if (trozos[3] != NULL) {
+                char *args[] = {"usermod", "-l", trozos[3], getpwuid(ruid)->pw_name, NULL};
+                if (execvp("usermod", args) == -1) {
+                    perror("Error al cambiar el login");
+                    return;
+                }
+            } else {
+                printf("Uso: -set -l [nuevo_login]\n");
+            }
+        } else {
+            // Cambiar ID
+            if (trozos[2] != NULL) {
+                if(setuid(atoi(trozos[2]))==-1){
+                    perror("Error setuid");
+                    return;
+                }
+                printf("ID de usuario cambiado a: %d\n", geteuid());
+            } else {
+                printf("Uso: -set [nuevo_id]\n");
             }
         }
     }
 }
+
+int main(int argc, char *argv[]) {
+    uid(argv);
+    return 0;
+}
+
 
 void showvar(char **trozos, char **arg3, char **environ){
     if(trozos[1]==NULL){
