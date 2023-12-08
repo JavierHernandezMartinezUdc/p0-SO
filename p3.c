@@ -274,7 +274,6 @@ void jobs(tListP P){
     tItemP x;
     char fecha[1024];
     char status[1024];
-    int prio;
     int endValue;
 
     for(p=firstP(P);p!=NULL;p=nextP(p,P)){
@@ -297,8 +296,6 @@ void jobs(tListP P){
             }
         }
 
-        prio=getpriority(PRIO_PROCESS,x.pid);
-
         updateItemP(x,p,&P);
 
         uid_t uid=getuid();
@@ -311,7 +308,7 @@ void jobs(tListP P){
         FechaHoraP(x.time,fecha);
         StatusToString(x.estado,status);
 
-        printf("  %d       %s p=%d %s %s (%d) %s\n",x.pid,userInfo->pw_name,prio,fecha,status,x.endValue,x.command);
+        printf("  %d       %s p=%d %s %s (%d) %s\n",x.pid,userInfo->pw_name,getpriority(PRIO_PROCESS,x.pid),fecha,status,x.endValue,x.command);
     }
 }
 
@@ -323,21 +320,21 @@ void deljobs(char **trozos, tListP *P){
     }
     else if(strcmp(trozos[1],"-term")==0){
         for(p=firstP(*P);p!=NULL;p=nextP(p,*P)){
+            if(!isEmptyListP(*P)){
+                p=firstP(*P);
+            }
             if(getItemP(p,*P).estado==FINISHED){
                 deleteAtPositionP(p,P);
-                if(!isEmptyListP(*P)){
-                    p=firstP(*P);
-                }
             }
         }
     }
     else if(strcmp(trozos[1],"-sig")==0){
         for(p=firstP(*P);p!=NULL;p=nextP(p,*P)){
-            if(getItemP(p,*P).estado==SIGNALED){ //Condicion???
+            if(!isEmptyListP(*P)){
+                p=firstP(*P);
+            }
+            if(getItemP(p,*P).estado==SIGNALED){
                 deleteAtPositionP(p,P);
-                if(!isEmptyListP(*P)){
-                    p=firstP(*P);
-                }
             }
         }
     }
@@ -351,7 +348,6 @@ void job(char **trozos, tListP *P){
     tItemP x;
     char fecha[1024];
     char status[1024];
-    int prio;
     int endValue;
 
     if(trozos[1]!=NULL){
@@ -375,18 +371,23 @@ void job(char **trozos, tListP *P){
                 if(WIFEXITED(endValue)){
                     x.estado=FINISHED;
                     x.endValue=WEXITSTATUS(endValue);
+                    StatusToString(x.estado,status);
+                    printf("El proceso %d ha terminado con estado %s (%d)\n",x.pid,status,x.endValue);
                 }
                 else if (WIFSTOPPED(endValue)){
                     x.estado=STOPPED;
                     x.endValue=WTERMSIG(endValue);
+                    StatusToString(x.estado,status);
+                    printf("El proceso %d ha sido detenido con estado %s (%d)\n",x.pid,status,x.endValue);
                 }
                 else if (WIFSIGNALED(endValue)){
                     x.estado=SIGNALED;
                     x.endValue=WTERMSIG(endValue);
+                    StatusToString(x.estado,status);
+                    printf("El proceso %d ha sido señalado con estado %s (%d)\n",x.pid,status,x.endValue);
                 }
+                deleteAtPositionP(p,P);
             }
-            StatusToString(x.estado,status);
-            printf("El proceso %d ha terminado con estado %s\n",x.pid,status);
         }
         else{ //Mostrar info
             p=findItem(atoi(trozos[1]), *P);
@@ -412,8 +413,6 @@ void job(char **trozos, tListP *P){
                 }
             }
 
-            prio=getpriority(PRIO_PROCESS,x.pid);
-
             updateItemP(x,p,P);
 
             uid_t uid=getuid();
@@ -426,7 +425,7 @@ void job(char **trozos, tListP *P){
             FechaHoraP(x.time,fecha);
             StatusToString(x.estado,status);
 
-            printf("  %d       %s p=%d %s %s (%d) %s\n",x.pid,userInfo->pw_name,prio,fecha,status,x.endValue,x.command);
+            printf("  %d       %s p=%d %s %s (%d) %s\n",x.pid,userInfo->pw_name,getpriority(PRIO_PROCESS,x.pid),fecha,status,x.endValue,x.command);
         }
     }
 }
@@ -444,13 +443,6 @@ void newProcess(char **trozos, tListP *P, int numWords){
         }
     }
     args[numWords-1]=NULL;
-
-    /* Mini test de args
-    for(int i=0;i<numWords-1;i++){
-        printf("%s\n",args[i]);
-    }
-    return;
-    */
 
     for(int i=0;i<numWords;i++){
         if(i!=numWords-1){
@@ -475,6 +467,7 @@ void newProcess(char **trozos, tListP *P, int numWords){
         x.pid=pid;
         time(&x.time);
         x.estado=ACTIVE;
+        x.endValue=0;
         strcpy(x.command,comando);
         if(!insertItemP(x,P)){
             printf("Imposible insertar\n");
@@ -485,7 +478,7 @@ void newProcess(char **trozos, tListP *P, int numWords){
         pid=fork();
 
         if(pid==0){
-            execvp(trozos[0],args);
+            execvp(trozos[0],trozos);
             exit(EXIT_SUCCESS);
         }
         else if(pid!=-1){
