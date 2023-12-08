@@ -10,6 +10,7 @@
 
 void uid(char **trozos){
     uid_t ruid, euid;
+    char comando[1024]="usermod -l ";
 
     ruid = getuid();
     euid = geteuid();
@@ -21,11 +22,10 @@ void uid(char **trozos){
         if (trozos[2] != NULL && strcmp(trozos[2], "-l") == 0) {
             // Cambiar login
             if (trozos[3] != NULL) {
-                char *args[] = {"usermod", "-l", trozos[3], getpwuid(ruid)->pw_name, NULL};
-                if (execvp("usermod", args) == -1) {
-                    perror("Error al cambiar el login");
-                    return;
-                }
+                strcat(comando,trozos[3]);
+                strcat(comando," ");
+                strcat(comando,getpwuid(ruid)->pw_name);
+                system(comando);
             } else {
                 printf("Uso: -set -l [nuevo_login]\n");
             }
@@ -43,12 +43,6 @@ void uid(char **trozos){
         }
     }
 }
-
-int main(int argc, char *argv[]) {
-    uid(argv);
-    return 0;
-}
-
 
 void showvar(char **trozos, char **arg3, char **environ){
     if(trozos[1]==NULL){
