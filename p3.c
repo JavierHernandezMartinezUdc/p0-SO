@@ -393,6 +393,7 @@ void job(char **trozos, tListP *P){
                     x.endValue=WEXITSTATUS(endValue);
                     StatusToString(x.estado,status);
                     printf("El proceso %d ha terminado con estado %s (%d)\n",x.pid,status,x.endValue);
+                    deleteAtPositionP(p,P);
                 }
                 else if (WIFSTOPPED(endValue)){
                     x.estado=STOPPED;
@@ -406,7 +407,6 @@ void job(char **trozos, tListP *P){
                     StatusToString(x.estado,status);
                     printf("El proceso %d ha sido señalado con estado %s (%d)\n",x.pid,status,x.endValue);
                 }
-                deleteAtPositionP(p,P);
             }
         }
         else{ //Mostrar info
