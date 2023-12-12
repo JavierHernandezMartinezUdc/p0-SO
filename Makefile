@@ -29,10 +29,10 @@ compilar: p0.o p1.o p2.o p3.o listaF.o listaH.o listaM.o listaP.o
 	rm -f *.o
 
 ejecutar:
-	./p0
+	sudo ./p0
 
 borrar:
 	rm -f *.o *.txt p0
 
 valgrind: borrar compilar
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-report.txt ./p0
+	sudo valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-report.txt ./p0

@@ -23,7 +23,13 @@ void uid(char **trozos){
             // Cambiar login
             if (trozos[3] != NULL) {
                 struct passwd *uide=getpwnam(trozos[3]);
-                seteuid(uide->pw_uid);
+                if(uide==NULL){
+                    printf("Usuario no encontrado\n");
+                }
+                else{
+                    seteuid(uide->pw_uid);
+                    printf("El usuario ha cambiado a %s\n",trozos[3]);
+                }
             } else {
                 printf("Uso: -set -l [nuevo_login]\n");
             }
