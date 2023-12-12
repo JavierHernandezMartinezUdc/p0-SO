@@ -32,7 +32,7 @@ void uid(char **trozos){
         } else {
             // Cambiar ID
             if (trozos[2] != NULL) {
-                if(setuid(atoi(trozos[2]))==-1){
+                if(seteuid(atoi(trozos[2]))==-1){
                     perror("Error setuid");
                     return;
                 }
