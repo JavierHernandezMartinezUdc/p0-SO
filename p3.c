@@ -22,10 +22,8 @@ void uid(char **trozos){
         if (trozos[2] != NULL && strcmp(trozos[2], "-l") == 0) {
             // Cambiar login
             if (trozos[3] != NULL) {
-                strcat(comando,trozos[3]);
-                strcat(comando," ");
-                strcat(comando,getpwuid(ruid)->pw_name);
-                system(comando);
+                struct passwd *uide=getpwnam(trozos[3]);
+                seteuid(uide->pw_uid);
             } else {
                 printf("Uso: -set -l [nuevo_login]\n");
             }
