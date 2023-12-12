@@ -17,12 +17,17 @@ void uid(char **trozos){
 
     if (trozos[1] == NULL || strcmp(trozos[1], "-get") == 0) {
         printf("ID de usuario real: %d, (%s)\n", ruid, getpwuid(ruid)->pw_name);
-        printf("ID de usuario efectivo: %d, (%s)\n", euid, getpwuid(euid)->pw_name);
+        if(getpwuid(euid)==NULL){
+            printf("ID de usuario efectivo: %d, (%s)\n", euid, "????");
+        }
+        else{
+            printf("ID de usuario efectivo: %d, (%s)\n", euid, getpwuid(euid)->pw_name);
+        }
     } else if(strcmp(trozos[1], "-set") == 0){
         if (trozos[2] != NULL && strcmp(trozos[2], "-l") == 0) {
             // Cambiar login
             if (trozos[3] != NULL) {
-                struct passwd *uide=getpwnam(trozos[3]);
+                struct passwd *uide=getpwnam(trozos[3]); //getpwnam da leaks de memoria
                 if(uide==NULL){
                     printf("Usuario no encontrado\n");
                 }
@@ -322,17 +327,10 @@ void jobs(tListP P){
 
         updateItemP(x,p,&P);
 
-        uid_t uid=getuid();
-        struct passwd *userInfo = getpwuid(uid);
-        if (userInfo == NULL) {
-            perror("Error al obtener la información del usuario");
-            return;
-        }
-
         FechaHoraP(x.time,fecha);
         StatusToString(x.estado,status);
 
-        printf("  %d       %s p=%d %s %s (%d) %s\n",x.pid,userInfo->pw_name,getpriority(PRIO_PROCESS,x.pid),fecha,status,x.endValue,x.command);
+        printf("  %d       %s p=%d %s %s (%d) %s\n",x.pid,x.usuario,getpriority(PRIO_PROCESS,x.pid),fecha,status,x.endValue,x.command);
     }
 }
 
@@ -439,17 +437,10 @@ void job(char **trozos, tListP *P){
 
             updateItemP(x,p,P);
 
-            uid_t uid=getuid();
-            struct passwd *userInfo = getpwuid(uid);
-            if (userInfo == NULL) {
-                perror("Error al obtener la información del usuario");
-                return;
-            }
-
             FechaHoraP(x.time,fecha);
             StatusToString(x.estado,status);
 
-            printf("  %d       %s p=%d %s %s (%d) %s\n",x.pid,userInfo->pw_name,getpriority(PRIO_PROCESS,x.pid),fecha,status,x.endValue,x.command);
+            printf("  %d       %s p=%d %s %s (%d) %s\n",x.pid,x.usuario,getpriority(PRIO_PROCESS,x.pid),fecha,status,x.endValue,x.command);
         }
     }
 }
@@ -493,6 +484,16 @@ void newProcess(char **trozos, tListP *P, int numWords){
         x.estado=ACTIVE;
         x.endValue=0;
         strcpy(x.command,comando);
+
+        uid_t uid=getuid();
+        struct passwd *userInfo = getpwuid(uid);
+        if (userInfo == NULL) {
+            perror("Error al obtener la información del usuario");
+            return;
+        }
+
+        strcpy(x.usuario,userInfo->pw_name);
+
         if(!insertItemP(x,P)){
             printf("Imposible insertar\n");
             return;

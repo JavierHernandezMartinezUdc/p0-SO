@@ -10,6 +10,7 @@ typedef struct tItemP{
     status estado;
     int endValue;
     char command[1024];
+    char usuario[1024];
 } tItemP;
 
 typedef struct tNodeP *tPosP;

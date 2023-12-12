@@ -1,4 +1,6 @@
-todo: borrar compilar ejecutar
+todo: borrar compile clean ejecutar
+
+compilar: borrar compile clean
 
 p0.o:
 	gcc -c -g p0.c
@@ -24,15 +26,18 @@ listaM.o:
 listaP.o:
 	gcc -c proc.c
 
-compilar: p0.o p1.o p2.o p3.o listaF.o listaH.o listaM.o listaP.o
+compile: p0.o p1.o p2.o p3.o listaF.o listaH.o listaM.o listaP.o
 	gcc -Wall -o p0 p0.o p1.o p2.o p3.o shellopenfiles.o historic.o mem.o proc.o
 	rm -f *.o
 
 ejecutar:
-	sudo ./p0
+	./p0
 
 borrar:
 	rm -f *.o *.txt p0
 
-valgrind: borrar compilar
-	sudo valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-report.txt ./p0
+valgrind: borrar compile clean
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-report.txt ./p0
+
+clean:
+	clear
