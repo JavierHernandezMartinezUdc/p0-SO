@@ -1,6 +1,6 @@
-todo: borrar compile clean ejecutar
+todo: borrar compile borrar clean ejecutar
 
-compilar: borrar compile clean
+compilar: borrar compile borrar clean
 
 p0.o:
 	gcc -c -g p0.c
@@ -36,7 +36,7 @@ ejecutar:
 borrar:
 	rm -f *.o *.txt p0
 
-valgrind: borrar compile clean
+valgrind: borrar compile borrar clean
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-report.txt ./p0
 
 clean:

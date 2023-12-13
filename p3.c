@@ -1,16 +1,8 @@
 #include "p3.h"
 #include <signal.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <pwd.h>
-#include <string.h>
-
 void uid(char **trozos){
     uid_t ruid, euid;
-    char comando[1024]="usermod -l ";
 
     ruid = getuid();
     euid = geteuid();
